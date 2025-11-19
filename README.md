@@ -1,6 +1,6 @@
-# How to Add New Articles to Your Blog
+# How to Add New Articles to The Blog
 
-Welcome! This guide will show you how to easily add new articles to your portfolio/blog site.
+Welcome! This guide will show you how to easily add new articles to the portfolio/blog site.
 
 ## Quick Start
 
