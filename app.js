@@ -1,4 +1,3 @@
-// Articles data embedded directly to work without a server
 const articlesData = {
   "articles": [
     {
@@ -12,27 +11,21 @@ const articlesData = {
   ]
 };
 
-// State management
 let currentSort = 'newest';
 let currentFilter = 'all';
 let searchQuery = '';
 let allArticles = [];
 
-// Load and display articles
 function loadArticles() {
     try {
         console.log('Articles loaded:', articlesData);
         
-        // Store all articles
         allArticles = [...articlesData.articles];
         
-        // Apply initial sort and filter
         displayFilteredArticles();
         
-        // Set up event listeners for sort/filter buttons
         setupSortFilterListeners();
         
-        // Set up search listener
         setupSearchListener();
     } catch (error) {
         console.error('Error loading articles:', error);
@@ -54,7 +47,6 @@ function setupSearchListener() {
 }
 
 function setupSortFilterListeners() {
-    // Filter buttons
     const filterButtons = document.querySelectorAll('.filter-btn');
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -65,7 +57,6 @@ function setupSortFilterListeners() {
         });
     });
     
-    // Sort buttons
     const sortButtons = document.querySelectorAll('.sort-btn-sidebar');
     sortButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -80,7 +71,6 @@ function setupSortFilterListeners() {
 function displayFilteredArticles() {
     let filteredArticles = [...allArticles];
     
-    // Apply search filter
     if (searchQuery) {
         filteredArticles = filteredArticles.filter(article => 
             article.title.toLowerCase().includes(searchQuery) ||
@@ -90,14 +80,12 @@ function displayFilteredArticles() {
         );
     }
     
-    // Apply category filter
     if (currentFilter !== 'all') {
         filteredArticles = filteredArticles.filter(article => 
             article.category.toLowerCase() === currentFilter.toLowerCase()
         );
     }
     
-    // Apply sort
     if (currentSort === 'newest') {
         filteredArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else if (currentSort === 'oldest') {
@@ -106,7 +94,6 @@ function displayFilteredArticles() {
         filteredArticles.sort((a, b) => a.title.localeCompare(b.title));
     }
     
-    // Display articles
     const container = document.getElementById('articles-container');
     
     if (container) {
@@ -140,17 +127,14 @@ function formatDate(dateString) {
     }).toUpperCase();
 }
 
-// Load articles when page loads
 if (document.getElementById('recent-articles')) {
     loadArticles();
 }
 
-// Load articles when page loads
 if (document.getElementById('articles-container')) {
     loadArticles();
 }
 
-// Article detail page functionality
 function loadArticleDetail() {
     const urlParams = new URLSearchParams(window.location.search);
     const articleId = urlParams.get('id');
@@ -170,10 +154,8 @@ function loadArticleDetail() {
             return;
         }
         
-        // Update page title
         document.title = `${article.title} - nowhere writer`;
         
-        // Display article
         const container = document.getElementById('article-content');
         container.innerHTML = `
             <div class="article-header">
@@ -195,25 +177,19 @@ function loadArticleDetail() {
     }
 }
 
-// Simple markdown to HTML converter
 function convertMarkdownToHTML(markdown) {
     let html = markdown;
     
-    // Headers
     html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
     html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
     html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
     
-    // Bold
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
-    // Italic
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
-    // Links
     html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
     
-    // Paragraphs
     html = html.split('\n\n').map(para => {
         if (!para.startsWith('<h') && para.trim()) {
             return `<p>${para}</p>`;
@@ -224,7 +200,6 @@ function convertMarkdownToHTML(markdown) {
     return html;
 }
 
-// Load article detail if on article page
 if (document.getElementById('article-content')) {
     loadArticleDetail();
 }
