@@ -1,0 +1,8 @@
+{
+  "id": "new-article-template",
+  "title": "Your Article Title Here",
+  "category": "Essay",
+  "date": "2025-11-19",
+  "excerpt": "Write a brief 1-2 sentence description of your article that will appear on the home page.",
+  "content": "# Your Article Title Here\n\nYour introduction paragraph goes here. Set the scene, introduce the topic.\n\n## First Section Heading\n\nWrite your first main point here. Use paragraphs to organize your thoughts.\n\nYou can use **bold text** for emphasis and *italic text* for subtle emphasis.\n\n## Second Section Heading\n\nContinue with your next point.\n\n### Subsection (if needed)\n\nBreak down complex ideas into smaller parts.\n\n## Conclusion\n\nWrap up your article with final thoughts.\n\n---\n\nREMEMBER:\n- Separate paragraphs with \\n\\n\n- Use # for headings (more # = smaller heading)\n- **bold** with double asterisks\n- *italic* with single asterisks\n- [links](https://example.com) in brackets and parentheses"
+}
