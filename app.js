@@ -55,12 +55,18 @@ function setupTagFilterListeners() {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
     
+    // Count articles per tag
+    const tagCounts = {};
+    allTags.forEach(tag => {
+        tagCounts[tag] = allArticles.filter(article => article.tags && article.tags.includes(tag)).length;
+    });
+
     // Add tags section
     const tagsSection = document.createElement('div');
     tagsSection.innerHTML = `
         <h2 style="margin-top: 15px;">Tags</h2>
         <button class="filter-btn tag-filter-btn active" data-tag="all">All Tags</button>
-        ${allTags.map(tag => `<button class="filter-btn tag-filter-btn" data-tag="${tag}">${tag}</button>`).join('')}
+        ${allTags.map(tag => `<button class="filter-btn tag-filter-btn" data-tag="${tag}">${tag} <span style='color:#888;'>(${tagCounts[tag]})</span></button>`).join('')}
     `;
     sidebar.appendChild(tagsSection);
     
