@@ -221,3 +221,45 @@ body.dark-mode .pagination button:disabled {
 body.dark-mode .pagination button:hover:not(:disabled) {
     background: #444;
 }
+
+/* Override inline styles for buttons */
+body.dark-mode .pagination button {
+    background: #333 !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .pagination button:disabled {
+    background: #222 !important;
+    color: #888 !important;
+    border-color: #444 !important;
+}
+
+/* Tag buttons in dark mode */
+body.dark-mode .filter-btn,
+body.dark-mode .tag-filter-btn {
+    background: #333 !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .filter-btn.active,
+body.dark-mode .tag-filter-btn.active {
+    background: #cc7700 !important;
+    color: #000 !important;
+}
+
+/* Header text in dark mode should be white/light */
+body.dark-mode header h1,
+body.dark-mode header .tagline,
+body.dark-mode header .lambda-badge,
+body.dark-mode .about-title {
+    color: #ffffff !important;
+}
+
+/* Back link should have dark background */
+body.dark-mode .back-link {
+    background: #333 !important;
+    border-color: #555 !important;
+    color: #66b3ff !important;
+}

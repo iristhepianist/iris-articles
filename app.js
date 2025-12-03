@@ -1,7 +1,7 @@
 let articlesData = null;
 let currentSort = 'newest';
 let currentFilter = 'all';
-let currentTagFilter = 'all';
+let currentTagFilters = []; // Changed to array for multi-select
 let searchQuery = '';
 let allArticles = [];
 let allTags = [];
@@ -64,20 +64,35 @@ function setupTagFilterListeners() {
     // Add tags section
     const tagsSection = document.createElement('div');
     tagsSection.innerHTML = `
-        <h2 style="margin-top: 15px;">Tags</h2>
-        <button class="filter-btn tag-filter-btn active" data-tag="all">All Tags</button>
+        <h2 style="margin-top: 15px;">Tags (click multiple)</h2>
+        <button class="filter-btn tag-filter-btn" data-tag="all">Clear All</button>
         ${allTags.map(tag => `<button class="filter-btn tag-filter-btn" data-tag="${tag}">${tag} <span style='color:#888;'>(${tagCounts[tag]})</span></button>`).join('')}
     `;
     sidebar.appendChild(tagsSection);
     
-    // Add event listeners
+    // Add event listeners for multi-select
     const tagButtons = document.querySelectorAll('.tag-filter-btn');
     tagButtons.forEach(button => {
         button.addEventListener('click', function() {
-            tagButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            currentTagFilter = this.dataset.tag;
-            currentPage = 1; // Reset to first page when filtering by tag
+            const tag = this.dataset.tag;
+            
+            if (tag === 'all') {
+                // Clear all selections
+                currentTagFilters = [];
+                tagButtons.forEach(btn => btn.classList.remove('active'));
+            } else {
+                // Toggle this tag
+                const index = currentTagFilters.indexOf(tag);
+                if (index > -1) {
+                    currentTagFilters.splice(index, 1);
+                    this.classList.remove('active');
+                } else {
+                    currentTagFilters.push(tag);
+                    this.classList.add('active');
+                }
+            }
+            
+            currentPage = 1;
             displayFilteredArticles();
         });
     });
@@ -129,9 +144,10 @@ function displayFilteredArticles() {
         });
     }
     
-    if (currentTagFilter !== 'all') {
+    // Filter by tags (match any selected tag)
+    if (currentTagFilters.length > 0) {
         filteredArticles = filteredArticles.filter(article => 
-            article.tags && article.tags.includes(currentTagFilter)
+            article.tags && article.tags.some(tag => currentTagFilters.includes(tag))
         );
     }
     
@@ -203,9 +219,9 @@ function changePage(page) {
         });
     }
     
-    if (currentTagFilter !== 'all') {
+    if (currentTagFilters.length > 0) {
         filtered = filtered.filter(article => 
-            article.tags && article.tags.includes(currentTagFilter)
+            article.tags && article.tags.some(tag => currentTagFilters.includes(tag))
         );
     }
     
