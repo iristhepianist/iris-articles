@@ -3,130 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article - nowhere writer</title>
+    <title>Article - lambda</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Courier New', 'Courier', monospace;
-            background: #000000;
-            color: #ffffff;
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            padding: 4rem 2rem;
+            font-family: Verdana, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 760px;
             margin: 0 auto;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding-bottom: 2rem;
-            border-bottom: 2px solid #ffffff;
+            background: #FFA500;
+            border: 2px solid #000000;
+            padding: 10px;
+            margin-bottom: 20px;
         }
 
         .site-title {
-            font-size: 1.2rem;
-            letter-spacing: 0.3em;
-            margin-bottom: 1rem;
-            color: #ffffff;
-            text-transform: uppercase;
-            font-weight: 400;
+            font-size: 16px;
+            margin: 0;
+            font-weight: bold;
         }
 
         .site-title a {
-            color: #ffffff;
-            text-decoration: none;
-            transition: color 0.3s ease;
+            color: #0000FF;
+            text-decoration: underline;
+        }
+
+        .site-title a:visited {
+            color: #800080;
         }
 
         .site-title a:hover {
-            color: #999;
+            color: #FF0000;
+        }
+
+        .lambda-badge {
+            float: right;
+            font-size: 20px;
+            color: #000000;
         }
 
         .article-header {
-            margin-bottom: 4rem;
-            text-align: center;
+            background: #EEEEEE;
+            border: 1px solid #000000;
+            padding: 15px;
+            margin-bottom: 20px;
         }
 
         .article-meta {
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #999;
-            margin-bottom: 2rem;
-            font-weight: 700;
+            font-size: 10px;
+            color: #666666;
+            margin-bottom: 10px;
         }
 
         .article-meta span {
-            margin: 0 1rem;
+            margin-right: 10px;
+        }
+
+        .article-author {
+            font-style: italic;
+        }
+
+        .article-tags {
+            font-size: 9px;
+            color: #888;
         }
 
         .article-header h1 {
-            font-size: 2rem;
-            font-weight: 400;
-            letter-spacing: 0.08em;
-            color: #fff;
-            text-transform: uppercase;
-            margin-bottom: 3rem;
-            line-height: 1.3;
-        }
-
-        /* Whimsical brutalist decorative element */
-        .article-header::after {
-            content: '✯';
-            display: block;
-            font-size: 1.5rem;
-            color: #fff;
-            margin-top: 2rem;
+            font-size: 18px;
+            margin: 10px 0 0 0;
+            color: #000000;
+            font-weight: bold;
         }
 
         .article-body {
-            padding: 4rem 3rem;
-            background: #000000;
-            border: 2px solid #ffffff;
-            margin-bottom: 4rem;
-            position: relative;
-        }
-
-        /* Brutalist corner accent */
-        .article-body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 40px;
-            border-top: 3px solid #fff;
-            border-left: 3px solid #fff;
-        }
-
-        .article-body::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 40px;
-            height: 40px;
-            border-bottom: 3px solid #fff;
-            border-right: 3px solid #fff;
+            background: #FFFFFF;
+            border: 1px solid #CCCCCC;
+            padding: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
         .article-body h1 {
-            font-size: 1.8rem;
-            margin: 3rem 0 1.5rem 0;
-            color: #fff;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+            color: #000000;
+            font-weight: bold;
+            border-bottom: 1px solid #FFA500;
+            padding-bottom: 3px;
         }
 
         .article-body h1:first-child {
@@ -134,185 +106,112 @@
         }
 
         .article-body h2 {
-            font-size: 1.3rem;
-            margin: 2.5rem 0 1.5rem 0;
-            color: #ffffff;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            position: relative;
-            padding-left: 1.5rem;
-        }
-
-        /* Whimsical bullet */
-        .article-body h2::before {
-            content: '◆';
-            position: absolute;
-            left: 0;
-            color: #999;
-            font-size: 0.8rem;
+            font-size: 14px;
+            margin: 15px 0 10px 0;
+            color: #000000;
+            font-weight: bold;
         }
 
         .article-body h3 {
-            font-size: 1.1rem;
-            margin: 2rem 0 1rem 0;
-            color: #ffffff;
-            font-weight: 400;
-            letter-spacing: 0.05em;
+            font-size: 13px;
+            margin: 10px 0 8px 0;
+            color: #000000;
+            font-weight: bold;
         }
 
         .article-body p {
-            margin-bottom: 1.8rem;
-            color: #ffffff;
-            line-height: 1.9;
-            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: #000000;
+            text-align: justify;
         }
 
         .article-body strong {
-            color: #ffffff;
-            font-weight: 700;
+            font-weight: bold;
         }
 
         .article-body em {
-            color: #999;
             font-style: italic;
         }
 
         .article-body a {
-            color: #ffffff;
-            text-decoration: none;
-            border-bottom: 1px solid #999;
-            transition: all 0.3s ease;
+            color: #0000FF;
+            text-decoration: underline;
+        }
+
+        .article-body a:visited {
+            color: #800080;
         }
 
         .article-body a:hover {
-            color: #999;
-            border-bottom-color: #999;
+            color: #FF0000;
         }
 
         .article-footer {
             text-align: center;
-            padding: 3rem 0;
-            border-top: 2px solid #ffffff;
+            margin: 20px 0;
         }
 
         .back-link {
             display: inline-block;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 1rem 2rem;
-            border: 2px solid #ffffff;
-            transition: all 0.3s ease;
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            font-weight: 700;
-            position: relative;
-            background: transparent;
+            background: #DDDDDD;
+            border: 1px solid #000000;
+            padding: 5px 15px;
+            color: #0000FF;
+            text-decoration: underline;
+            font-size: 11px;
         }
 
-        /* Brutalist button effect */
-        .back-link::before {
-            content: '';
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            right: -4px;
-            bottom: -4px;
-            border: 1px solid #111;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        .back-link:visited {
+            color: #800080;
         }
 
         .back-link:hover {
-            color: #000;
-            background: #fff;
-            border-color: #fff;
-            transform: translate(-2px, -2px);
-        }
-
-        .back-link:hover::before {
-            opacity: 1;
+            background: #CCCCCC;
+            color: #FF0000;
         }
 
         footer {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 2px solid #ffffff;
+            margin-top: 20px;
+            padding: 10px;
+            background: #EEEEEE;
+            border: 1px solid #000000;
             text-align: center;
+            font-size: 10px;
         }
 
         .footer-note {
-            font-size: 0.75rem;
-            color: #999;
-            font-style: italic;
-            letter-spacing: 0.05em;
+            margin: 0;
         }
 
-        /* Whimsical floating symbols */
-        .whimsy-symbol {
-            position: fixed;
-            color: #1a1a1a;
-            font-size: 2rem;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-
-        .whimsy-1 { top: 10%; left: 5%; content: '◆'; }
-        .whimsy-2 { top: 30%; right: 8%; content: '✦'; }
-        .whimsy-3 { bottom: 20%; left: 10%; content: '✯'; }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 2rem 1.5rem;
-            }
-
-            .article-header h1 {
-                font-size: 1.5rem;
-                letter-spacing: 0.05em;
-            }
-
-            .article-body {
-                padding: 3rem 2rem;
-            }
-
-            .article-body h1 {
-                font-size: 1.4rem;
-            }
-
-            .article-body h2 {
-                font-size: 1.2rem;
-            }
-
-            .whimsy-symbol {
-                display: none;
-            }
+        hr {
+            border: 0;
+            border-top: 1px solid #CCCCCC;
+            margin: 15px 0;
         }
     </style>
+    <link rel="stylesheet" href="darkmode.css">
 </head>
 <body>
-    <!-- Whimsical floating symbols -->
-    <div class="whimsy-symbol whimsy-1">◆</div>
-    <div class="whimsy-symbol whimsy-2">✦</div>
-    <div class="whimsy-symbol whimsy-3">✯</div>
-
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 DARK MODE</button>
     <div class="container">
         <header>
+            <span class="lambda-badge">λ</span>
             <div class="site-title">
-                <a href="index.html">nowhere writer</a>
+                <a href="index.html">« back to lambda</a>
             </div>
         </header>
 
         <div id="article-content">
             <!-- Article will be loaded here by JavaScript -->
-            <p style="text-align: center; color: #555;">Loading...</p>
+            <p style="text-align: center; color: #999999;">Loading article...</p>
         </div>
 
         <footer>
-            <p class="footer-note">somewhere between truth and fiction</p>
+            <p class="footer-note">All articles are contributed by our members. Sources are cited where applicable.</p>
         </footer>
     </div>
 
     <script src="app.js"></script>
+    <script src="darkmode.js"></script>
 </body>
 </html>

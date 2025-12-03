@@ -1,0 +1,223 @@
+.dark-mode-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #DDDDDD;
+    border: 1px solid #000000;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 10px;
+    z-index: 1000;
+}
+
+.dark-mode-toggle:hover {
+    background: #CCCCCC;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode header {
+    background: #cc7700;
+    border-color: #555;
+}
+
+body.dark-mode nav {
+    background: #333;
+    border-color: #555;
+}
+
+body.dark-mode nav a {
+    color: #66b3ff;
+}
+
+body.dark-mode nav a:visited {
+    color: #b399cc;
+}
+
+body.dark-mode nav a:hover {
+    color: #ff6666;
+}
+
+body.dark-mode table {
+    background: #1a1a1a;
+    border-color: #555;
+}
+
+body.dark-mode table td {
+    border-color: #444;
+}
+
+body.dark-mode .sidebar {
+    background: #2a2a2a;
+}
+
+body.dark-mode .sidebar h2 {
+    background: #cc7700;
+    border-color: #555;
+}
+
+body.dark-mode .search-input {
+    background: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark-mode .filter-btn, 
+body.dark-mode .sort-btn-sidebar {
+    background: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .filter-btn:hover, 
+body.dark-mode .sort-btn-sidebar:hover {
+    background: #444;
+}
+
+body.dark-mode .filter-btn.active, 
+body.dark-mode .sort-btn-sidebar.active {
+    background: #cc7700;
+    color: #000;
+}
+
+body.dark-mode .article-item {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+body.dark-mode .article-item:hover {
+    background: #3a3a3a;
+}
+
+body.dark-mode .article-item h3 {
+    color: #66b3ff;
+}
+
+body.dark-mode .article-meta {
+    color: #999;
+}
+
+body.dark-mode .article-excerpt {
+    color: #ccc;
+}
+
+body.dark-mode footer {
+    background: #2a2a2a;
+    border-color: #555;
+}
+
+body.dark-mode .dark-mode-toggle {
+    background: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background: #444;
+}
+
+/* Dark mode for about page */
+body.dark-mode .about-box {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+body.dark-mode .about-text {
+    color: #ccc;
+}
+
+body.dark-mode .contact-box {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+/* Dark mode for article page */
+body.dark-mode .article-header {
+    background: #2a2a2a;
+    border-color: #555;
+}
+
+body.dark-mode .article-body {
+    background: #1a1a1a;
+    border-color: #444;
+}
+
+body.dark-mode .article-body h1,
+body.dark-mode .article-body h2,
+body.dark-mode .article-body h3 {
+    color: #e0e0e0;
+    border-color: #cc7700;
+}
+
+body.dark-mode .article-body p {
+    color: #ccc;
+}
+
+body.dark-mode .article-body a {
+    color: #66b3ff;
+}
+
+body.dark-mode .article-footer {
+    background: #2a2a2a;
+    border-color: #555;
+}
+
+body.dark-mode .back-link {
+    color: #66b3ff;
+}
+
+body.dark-mode .back-link:hover {
+    color: #ff6666;
+}
+
+/* Dark mode for changelog page */
+body.dark-mode .changelog-container {
+    background: #1a1a1a;
+    border-color: #555;
+}
+
+body.dark-mode .changelog-intro {
+    background: #3a3a00;
+    border-color: #cc7700;
+}
+
+body.dark-mode .changelog-entry {
+    border-color: #444;
+}
+
+body.dark-mode .changelog-date {
+    color: #cc7700;
+}
+
+body.dark-mode .changelog-item-title {
+    color: #66b3ff;
+}
+
+body.dark-mode .changelog-item-meta {
+    color: #999;
+}
+
+/* Pagination dark mode */
+body.dark-mode .pagination {
+    background: #2a2a2a !important;
+    border-color: #555 !important;
+}
+
+body.dark-mode .pagination button {
+    background: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .pagination button:disabled {
+    background: #222;
+    color: #888;
+}
+
+body.dark-mode .pagination button:hover:not(:disabled) {
+    background: #444;
+}

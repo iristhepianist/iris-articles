@@ -1,37 +1,41 @@
-const articlesData = {
-  "articles": [
-    {
-      "id": "ai-in-2025-opinion",
-      "title": "AI in 2025",
-      "category": "Essay",
-      "date": "2025-11-19",
-      "excerpt": "A personal critique of the omnipresence of AI in modern workflows, questioning whether adoption is truly a net benefit for ordinary users, workers, and the broader tech ecosystem.",
-      "content": "What do you think when you think of the technological advancements that happened this year?\n\nNow think. How many of them have been AI-related in some way?\n\nExactly.\n\nWe all use a little AI in all our workflows, believe it or not. I know many a person who seem to be against GenAI on the outside, but secretly use ChatGPT to make their searching a little easier.\n\nThis utility that AI has for us is not a tool, but it is a leech. Companies like Microsoft and OpenAI believe that, because of these niche applications of AI, they could earn more money by shoving it into every nook and cranny of their goddamn ecosystem.\nAsk any Windows 11 user and you'll probably get to know the average user's experience with something like Copilot.\n\nAI has boosted the Global GDP, yes- there's no doubt in that. AI adoption is projected to deliver a 12–15% boost to global GDP over the next decade, equal to between $7 and $15.7 trillion in additional output. Rapid automation of routine tasks and optimization of logistics, manufacturing, and services have driven efficiency and supported broad sector growth. But at what cost? Labor markets have become more volatile, as the jobs around AI are much fewer in number than traditional white collar jobs. Additionally, the old sanctity of the workplace is diminished by the cold automation done by these companies. This may seem silly to hear, but I fear having to work around AI automated servers is like having a really stupid junior engineer who's sole merit is doing things quickly, but who needs hyperspecific instructions for even basic tasks. Rubbish, honestly!\n\nHowever may the big firms say \"upskilling\" is necessary, using AI still depends largely on the tool itself. And as we are nearing the popping of the AI bubble, the skills we worked so hard to acquire might become as useless as IT degrees are now, in countries like India. It would be a relic of a bygone time.\n\nAdditionally, AI usage for the consumer is hardly optimized either. It is shoved into every app, every website, every OS- (not you, Linux!) only because it is another buzzword to add to the pile of slop these companies already produce. Useless AI applications, where humans more than excel already, and where AI is basically useless for the consumer, are growing day by day, making our life harder as well as the worker's.\n\nOutside of software, the AI bubble is making the hardware market experience a sharp decline in availability of parts. RAM has more than tripled in price, mostly because AI firms are buying massive amounts of RAM to run their LLMs, and it is a very bad time to buy most hardware- GPU companies like NVidia are earning way more from AI firms, so they are not incentivised to work for the consumer. SSDs and HDDs for storage, also have had an increase in price, which means an annoying uptick to anyone wanting to make a build in 2025.\n\nHow do we use AI safely? Well, like all good things in life, there are FOSS alternatives. FOSS is a concept that means FREE, OPEN SOURCE, SOFTWARE. People with good gpus can run local AIs, and experiment with them too, while keeping privacy secure (Ooh, that is a good topic for the future!) in this age of publicity.\n\nIn my personal opinion, the working class of white collar workers need to unionise. Many of them possess skills in management, programming, and other fields, which are a boon in software development, but are chained by the bounds of corporate life. Their passion and love for code, for computers, evaporates in contact with corporate life; Some enjoy the job, some don't. However, a union of white collar workers could fuel this young flame within each other again; they will protect each other from the bounds of corporate life, and encourage a new wave of innovation, for programmers by programmers.\n\nMany projects like this exist already- Linux Kernel, KDE, etc. all work unionised, not as a company, and whoever feels passionate and can contribute is free to do so. That is the beauty of FOSS, and why closed source corporate software will never match the beauty of FOSS.\n\nI feel non-profit oriented programming should work best for us in this era, closing the age of subscription based services and bringing a new flame of free, open source alternatives, to which anyone can contribute and do their part, for the good of both the user, the developer, and the software.\n\nThanks for reading my first article! I'll expand on the topics of privacy and white-collar unions more in a later essay, as I feel this one is getting a bit too wordy. I'll see you in the next one!\n\n- iris"
-    }
-  ]
-};
-
+let articlesData = null;
 let currentSort = 'newest';
 let currentFilter = 'all';
+let currentTagFilter = 'all';
 let searchQuery = '';
 let allArticles = [];
+let allTags = [];
+let currentPage = 1;
+const articlesPerPage = 5;
 
-function loadArticles() {
+async function loadArticles() {
     try {
+        // Fetch articles from JSON file
+        const response = await fetch('articles.json');
+        if (!response.ok) {
+            throw new Error('Failed to load articles');
+        }
+        articlesData = await response.json();
+        
         console.log('Articles loaded:', articlesData);
         
         allArticles = [...articlesData.articles];
         
+        // Collect unique tags
+        allTags = [...new Set(allArticles.flatMap(article => article.tags || []))].sort();
+        
         displayFilteredArticles();
         
         setupSortFilterListeners();
+        
+        setupTagFilterListeners();
         
         setupSearchListener();
     } catch (error) {
         console.error('Error loading articles:', error);
         const container = document.getElementById('articles-container');
         if (container) {
-            container.innerHTML = '<p style="color: #888; text-align: center; font-style: italic;">Error loading articles.</p>';
+            container.innerHTML = '<p style="color: #888; text-align: center; font-style: italic;">Error loading articles. Please check articles.json file.</p>';
         }
     }
 }
@@ -41,9 +45,36 @@ function setupSearchListener() {
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {
             searchQuery = e.target.value.toLowerCase();
+            currentPage = 1; // Reset to first page when searching
             displayFilteredArticles();
         });
     }
+}
+
+function setupTagFilterListeners() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    
+    // Add tags section
+    const tagsSection = document.createElement('div');
+    tagsSection.innerHTML = `
+        <h2 style="margin-top: 15px;">Tags</h2>
+        <button class="filter-btn tag-filter-btn active" data-tag="all">All Tags</button>
+        ${allTags.map(tag => `<button class="filter-btn tag-filter-btn" data-tag="${tag}">${tag}</button>`).join('')}
+    `;
+    sidebar.appendChild(tagsSection);
+    
+    // Add event listeners
+    const tagButtons = document.querySelectorAll('.tag-filter-btn');
+    tagButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            tagButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            currentTagFilter = this.dataset.tag;
+            currentPage = 1; // Reset to first page when filtering by tag
+            displayFilteredArticles();
+        });
+    });
 }
 
 function setupSortFilterListeners() {
@@ -53,6 +84,7 @@ function setupSortFilterListeners() {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             currentFilter = this.dataset.filter;
+            currentPage = 1; // Reset to first page when filtering
             displayFilteredArticles();
         });
     });
@@ -63,6 +95,7 @@ function setupSortFilterListeners() {
             sortButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             currentSort = this.dataset.sort;
+            currentPage = 1; // Reset to first page when sorting
             displayFilteredArticles();
         });
     });
@@ -76,13 +109,23 @@ function displayFilteredArticles() {
             article.title.toLowerCase().includes(searchQuery) ||
             article.excerpt.toLowerCase().includes(searchQuery) ||
             article.category.toLowerCase().includes(searchQuery) ||
-            article.content.toLowerCase().includes(searchQuery)
+            article.content.toLowerCase().includes(searchQuery) ||
+            (article.tags && article.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
         );
     }
     
     if (currentFilter !== 'all') {
+        filteredArticles = filteredArticles.filter(article => {
+            const category = article.category.toLowerCase();
+            const filter = currentFilter.toLowerCase();
+            // Match exact or if category starts with filter (e.g., "essay" matches "Essay")
+            return category === filter || category.startsWith(filter);
+        });
+    }
+    
+    if (currentTagFilter !== 'all') {
         filteredArticles = filteredArticles.filter(article => 
-            article.category.toLowerCase() === currentFilter.toLowerCase()
+            article.tags && article.tags.includes(currentTagFilter)
         );
     }
     
@@ -98,10 +141,79 @@ function displayFilteredArticles() {
     
     if (container) {
         if (filteredArticles.length > 0) {
-            displayArticles(filteredArticles, container);
+            displayArticlesWithPagination(filteredArticles, container);
         } else {
             container.innerHTML = '<p style="color: #666; text-align: center; font-style: italic;">No articles found matching your search or filter.</p>';
         }
+    }
+}
+
+function displayArticlesWithPagination(articles, container) {
+    // Remove old pagination if it exists
+    const oldPagination = document.querySelector('.pagination');
+    if (oldPagination) {
+        oldPagination.remove();
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(articles.length / articlesPerPage);
+    const startIndex = (currentPage - 1) * articlesPerPage;
+    const endIndex = startIndex + articlesPerPage;
+    const paginatedArticles = articles.slice(startIndex, endIndex);
+    
+    // Display articles
+    displayArticles(paginatedArticles, container);
+    
+    // Add pagination controls
+    const paginationHTML = `
+        <div class="pagination" style="text-align: center; margin-top: 20px; padding: 10px; background: #EEEEEE; border: 1px solid #CCCCCC;">
+            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} style="padding: 5px 10px; margin: 0 5px; cursor: pointer; background: #DDDDDD; border: 1px solid #000; font-size: 11px;">← PREV</button>
+            <span style="margin: 0 10px; font-size: 11px;">Page ${currentPage} of ${totalPages} (${articles.length} articles)</span>
+            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} style="padding: 5px 10px; margin: 0 5px; cursor: pointer; background: #DDDDDD; border: 1px solid #000; font-size: 11px;">NEXT →</button>
+        </div>
+    `;
+    container.insertAdjacentHTML('afterend', paginationHTML);
+}
+
+function changePage(page) {
+    const totalFilteredArticles = [...allArticles];
+    let filtered = totalFilteredArticles;
+    
+    if (searchQuery) {
+        filtered = filtered.filter(article => 
+            article.title.toLowerCase().includes(searchQuery) ||
+            article.excerpt.toLowerCase().includes(searchQuery) ||
+            article.category.toLowerCase().includes(searchQuery) ||
+            article.content.toLowerCase().includes(searchQuery) ||
+            (article.tags && article.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
+        );
+    }
+    
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(article => {
+            const category = article.category.toLowerCase();
+            const filter = currentFilter.toLowerCase();
+            return category === filter || category.startsWith(filter);
+        });
+    }
+    
+    if (currentTagFilter !== 'all') {
+        filtered = filtered.filter(article => 
+            article.tags && article.tags.includes(currentTagFilter)
+        );
+    }
+    
+    const totalPages = Math.ceil(filtered.length / articlesPerPage);
+    
+    if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        // Remove old pagination
+        const oldPagination = document.querySelector('.pagination');
+        if (oldPagination) {
+            oldPagination.remove();
+        }
+        displayFilteredArticles();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
@@ -111,6 +223,7 @@ function displayArticles(articles, container) {
             <div class="article-meta">
                 <span>${article.category}</span>
                 <span>${formatDate(article.date)}</span>
+                ${article.tags ? `<span class='article-tags'>tags: ${article.tags.join(', ')}</span>` : ''}
             </div>
             <h3>${article.title}</h3>
             <p class="article-excerpt">${article.excerpt}</p>
@@ -145,36 +258,43 @@ function loadArticleDetail() {
         return;
     }
     
-    try {
-        const article = articlesData.articles.find(a => a.id === articleId);
-        
-        if (!article) {
-            document.getElementById('article-content').innerHTML = 
-                '<p style="text-align: center; color: #666;">Article not found.</p>';
-            return;
-        }
-        
-        document.title = `${article.title} - nowhere writer`;
-        
-        const container = document.getElementById('article-content');
-        container.innerHTML = `
-            <div class="article-header">
-                <div class="article-meta">
-                    <span>${article.category}</span>
-                    <span>${formatDate(article.date)}</span>
+    // Load articles from JSON first, then display
+    fetch('articles.json')
+        .then(response => response.json())
+        .then(data => {
+            const article = data.articles.find(a => a.id === articleId);
+            
+            if (!article) {
+                document.getElementById('article-content').innerHTML = 
+                    '<p style="text-align: center; color: #666;">Article not found.</p>';
+                return;
+            }
+            
+            document.title = `${article.title} - lambda`;
+            
+            const container = document.getElementById('article-content');
+            container.innerHTML = `
+                <div class="article-header">
+                    <div class="article-meta">
+                        <span>${article.category}</span>
+                        <span>${formatDate(article.date)}</span>
+                        ${article.tags ? `<span class='article-tags'>tags: ${article.tags.join(', ')}</span>` : ''}
+                    </div>
+                    <h1>${article.title}</h1>
                 </div>
-                <h1>${article.title}</h1>
-            </div>
-            <div class="article-body">
-                ${convertMarkdownToHTML(article.content)}
-            </div>
-            <div class="article-footer">
-                <a href="index.html" class="back-link">← BACK TO HOME</a>
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error loading article:', error);
-    }
+                <div class="article-body">
+                    ${convertMarkdownToHTML(article.content)}
+                </div>
+                <div class="article-footer">
+                    <a href="index.html" class="back-link">← BACK TO HOME</a>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error loading article:', error);
+            document.getElementById('article-content').innerHTML = 
+                '<p style="text-align: center; color: #666;">Error loading article.</p>';
+        });
 }
 
 function convertMarkdownToHTML(markdown) {

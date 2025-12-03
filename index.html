@@ -3,554 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nowhere writer</title>
+    <title>lambda</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Courier New', 'Courier', monospace;
-            background: #000000;
-            color: #ffffff;
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            padding: 0;
+            font-family: Verdana, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
         }
 
-        /* Main layout with sidebar */
-        .site-wrapper {
-            display: flex;
-            min-height: 100vh;
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
         }
 
-        /* Sidebar */
+        header {
+            background: #FFA500;
+            border: 2px solid #000000;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 5px 0;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        .tagline {
+            font-size: 11px;
+            margin: 0;
+            color: #000000;
+        }
+
+        nav {
+            background: #CCCCCC;
+            border: 1px solid #000000;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+
+        nav a {
+            color: #0000FF;
+            text-decoration: underline;
+            margin-right: 15px;
+            font-size: 11px;
+        }
+
+        nav a:visited {
+            color: #800080;
+        }
+
+        nav a:hover {
+            color: #FF0000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFFFFF;
+            border: 1px solid #000000;
+            margin-bottom: 15px;
+        }
+
+        table td {
+            padding: 8px;
+            border: 1px solid #CCCCCC;
+            vertical-align: top;
+        }
+
         .sidebar {
-            width: 280px;
-            background: #000000;
-            border-right: 2px solid #2a2a2a;
-            padding: 3rem 2rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 100;
-            left: 0;
-        }
-        
-        .sidebar.active {
-            transform: translateX(0);
-        }
-        
-        /* Close button for sidebar */
-        .sidebar-close {
-            display: none;
+            width: 180px;
+            background: #EEEEEE;
         }
 
         .sidebar h2 {
-            font-size: 0.65rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-
-        .sidebar h2::before {
-            content: '✯ ';
-            color: #444;
-        }
-
-        /* Search Box */
-        .search-box {
-            margin-bottom: 3rem;
+            font-size: 11px;
+            background: #FFA500;
+            padding: 3px;
+            margin: 0 0 8px 0;
+            border: 1px solid #000000;
+            font-weight: bold;
         }
 
         .search-input {
             width: 100%;
-            background: #ffffff;
-            border: 2px solid #000;
-            color: #000;
-            font-family: 'Courier New', 'Courier', monospace;
-            font-size: 0.85rem;
-            padding: 0.75rem;
-            letter-spacing: 0.05em;
-            transition: all 0.3s ease;
+            border: 1px solid #000000;
+            padding: 2px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            box-sizing: border-box;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: #000;
-            background: #ffffff;
-        }
-
-        .search-input::placeholder {
-            color: #666;
-        }
-
-        /* Filter Section */
-        .filter-section {
-            margin-bottom: 3rem;
-        }
-
-        .filter-btn {
+        .filter-btn, .sort-btn-sidebar {
             display: block;
             width: 100%;
-            background: transparent;
-            border: none;
-            color: #666;
-            font-family: 'Courier New', 'Courier', monospace;
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
+            background: #DDDDDD;
+            border: 1px solid #000000;
+            padding: 3px;
+            margin-bottom: 3px;
             cursor: pointer;
-            padding: 0.75rem 0;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 10px;
             text-align: left;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            border-bottom: 1px solid #1a1a1a;
         }
 
-        .filter-btn:hover {
-            color: #aaa;
-            padding-left: 0.5rem;
+        .filter-btn:hover, .sort-btn-sidebar:hover {
+            background: #CCCCCC;
         }
 
-        .filter-btn.active {
-            color: #fff;
-            border-left: 3px solid #fff;
-            padding-left: 1rem;
-        }
-
-        .filter-btn::before {
-            content: attr(data-icon) ' ';
-            margin-right: 0.5rem;
-        }
-
-        /* Sort Section */
-        .sort-section-sidebar {
-            margin-bottom: 3rem;
-        }
-
-        .sort-btn-sidebar {
-            display: block;
-            width: 100%;
-            background: transparent;
-            border: 2px solid #222;
-            color: #888;
-            font-family: 'Courier New', 'Courier', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            padding: 0.75rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-        }
-
-        .sort-btn-sidebar:hover {
-            border-color: #444;
-            color: #aaa;
-        }
-
-        .sort-btn-sidebar.active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: 280px;
-            flex: 1;
-            padding: 4rem 4rem 4rem 6rem;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .main-content.sidebar-open {
-            margin-left: 280px;
-        }
-
-        .container {
-            max-width: 900px;
-            width: 100%;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding-bottom: 3rem;
-            border-bottom: 3px solid #fff;
-            position: relative;
-        }
-
-        header::after {
-            content: '✯';
-            position: absolute;
-            bottom: -1.2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 0 1rem;
-            font-size: 1.5rem;
-            color: #fff;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: 0.3em;
-            margin-bottom: 1.5rem;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
-        .tagline {
-            font-size: 0.9rem;
-            color: #999;
-            letter-spacing: 0.2em;
-            font-style: italic;
-        }
-
-        nav {
-            margin-top: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-        }
-
-        nav a {
-            color: #888;
-            text-decoration: none;
-            font-size: 0.75rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            transition: color 0.3s ease;
-            font-weight: 700;
-            padding-bottom: 0.25rem;
-            border-bottom: 2px solid transparent;
-        }
-
-        nav a:hover {
-            color: #fff;
-            border-bottom-color: #fff;
+        .filter-btn.active, .sort-btn-sidebar.active {
+            background: #FFA500;
+            font-weight: bold;
         }
 
         .section-title {
-            font-size: 0.7rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: #fff;
-            margin-bottom: 4rem;
-            text-align: center;
-            font-weight: 700;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #333;
-        }
-
-        .section-title::before,
-        .section-title::after {
-            content: '✯';
-            margin: 0 1.5rem;
-            color: #fff;
-        }
-
-        .articles-list {
-            margin-bottom: 6rem;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 3px;
+            border-bottom: 2px solid #FFA500;
         }
 
         .article-item {
-            margin-bottom: 4rem;
-            padding-bottom: 4rem;
-            border-bottom: 2px solid #222;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #F9F9F9;
+            border: 1px solid #CCCCCC;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .article-item::before {
-            content: '→';
-            position: absolute;
-            left: -2rem;
-            top: 3rem;
-            color: #444;
-            opacity: 0;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .article-item:last-child {
-            border-bottom: none;
         }
 
         .article-item:hover {
-            padding-left: 2rem;
-        }
-
-        .article-item:hover::before {
-            opacity: 1;
-            left: 0;
-            color: #fff;
-        }
-
-        .article-item:hover h3 {
-            color: #fff;
+            background: #FFFFCC;
         }
 
         .article-meta {
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
+            font-size: 10px;
+            color: #666666;
+            margin-bottom: 5px;
         }
 
         .article-meta span {
-            margin-right: 2rem;
+            margin-right: 10px;
+        }
+
+        .article-author {
+            font-style: italic;
+        }
+
+        .article-tags {
+            font-size: 9px;
+            color: #888;
         }
 
         .article-item h3 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            margin-bottom: 1.5rem;
-            color: #ddd;
-            text-transform: uppercase;
-            transition: color 0.3s ease;
+            font-size: 13px;
+            margin: 5px 0;
+            color: #0000FF;
+            font-weight: bold;
+        }
+
+        .article-item:hover h3 {
+            text-decoration: underline;
         }
 
         .article-excerpt {
-            font-size: 0.95rem;
-            line-height: 1.9;
-            color: #999;
-            font-style: italic;
-            max-width: 700px;
-        }
-
-        .about-section {
-            margin-top: 8rem;
-            padding: 4rem;
-            border: 2px solid #2a2a2a;
-            text-align: center;
-            position: relative;
-            background: #000000;
-        }
-
-        .about-section::before {
-            content: '✯';
-            position: absolute;
-            top: -1.2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 0 1rem;
-            color: #fff;
-            font-size: 1.5rem;
-        }
-
-        .about-section h2 {
-            font-size: 0.8rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: #fff;
-            margin-bottom: 2rem;
-            font-weight: 700;
-        }
-
-        .about-section p {
-            font-size: 0.95rem;
-            line-height: 1.9;
-            color: #aaa;
-            font-style: italic;
-            max-width: 600px;
-            margin: 0 auto 1.5rem;
+            font-size: 11px;
+            color: #333333;
+            line-height: 1.4;
         }
 
         footer {
-            margin-top: 6rem;
-            padding: 3rem 0;
-            border-top: 3px solid #fff;
+            margin-top: 20px;
+            padding: 10px;
+            background: #EEEEEE;
+            border: 1px solid #000000;
             text-align: center;
-            position: relative;
-        }
-
-        footer::before {
-            content: '✯';
-            position: absolute;
-            top: -1.2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 0 1rem;
-            font-size: 1.5rem;
-            color: #fff;
+            font-size: 10px;
         }
 
         .footer-note {
-            font-size: 0.8rem;
-            color: #888;
-            font-style: italic;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
+            margin: 0;
         }
 
-        .footer-copyright {
-            font-size: 0.7rem;
-            color: #666;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-top: 1rem;
-        }
-
-        .desktop-note {
-            font-size: 0.7rem;
-            color: #555;
-            font-style: italic;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #222;
-        }
-
-        /* Whimsical symbols */
-        .whimsy-symbol {
-            position: fixed;
-            color: #1a1a1a;
-            font-size: 3rem;
-            pointer-events: none;
-            opacity: 0.15;
-            z-index: 0;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .whimsy-1 { 
-            top: 15%; 
-            right: 10%; 
-            animation-delay: 0s;
-        }
-        
-        .whimsy-2 { 
-            bottom: 20%; 
-            left: 10%; 
-            animation-delay: 2s;
-        }
-        
-        .whimsy-3 { 
-            top: 50%; 
-            right: 5%; 
-            animation-delay: 4s;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .sidebar-toggle {
-                display: block;
-            }
-
-            .main-content {
-                padding: 3rem 2rem;
-                margin-left: 0 !important;
-            }
-
-            .site-wrapper {
-                flex-direction: column;
-            }
-
-            h1 {
-                font-size: 2rem;
-                letter-spacing: 0.2em;
-            }
-
-            .whimsy-symbol, .ascii-art {
-                display: none;
-            }
+        .lambda-badge {
+            float: right;
+            font-size: 20px;
+            color: #000000;
         }
     </style>
+    <link rel="stylesheet" href="darkmode.css">
 </head>
 <body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙 DARK MODE</button>
 <body>
-    <!-- Whimsical goons#-->
-    <div class="whimsy-symbol whimsy-1">✯</div>
-    <div class="whimsy-symbol whimsy-2">♠</div>
-    <div class="whimsy-symbol whimsy-3">♣</div>
+    <div class="container">
+        <header>
+            <span class="lambda-badge">λ</span>
+            <h1>lambda</h1>
+            <p class="tagline">youth journalism</p>
+        </header>
 
-    <div class="site-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="search-box">
-                <h2>Search</h2>
-                <input type="text" class="search-input" id="search-input" placeholder="type to search...">
-            </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="changelog.html">Changelog</a>
+        </nav>
 
-            <div class="filter-section">
-                <h2>Filter By</h2>
-                <button class="filter-btn active" data-filter="all" data-icon="✯">All Articles</button>
-                <button class="filter-btn" data-filter="essays" data-icon="♠">Essays</button>
-                <button class="filter-btn" data-filter="reports" data-icon="♣">Reports</button>
-                <button class="filter-btn" data-filter="reviews" data-icon="◆">Reviews</button>
-            </div>
+        <table>
+            <tr>
+                <td class="sidebar">
+                    <h2>Search</h2>
+                    <input type="text" class="search-input" id="search-input" placeholder="search articles...">
+                    
+                    <h2 style="margin-top: 15px;">Filter By</h2>
+                    <button class="filter-btn active" data-filter="all">All Articles</button>
+                    <button class="filter-btn" data-filter="essay">Essays</button>
+                    <button class="filter-btn" data-filter="report">Reports</button>
+                    <button class="filter-btn" data-filter="opinion">Opinion Pieces</button>
+                    
+                    <h2 style="margin-top: 15px;">Sort By</h2>
+                    <button class="sort-btn-sidebar active" data-sort="newest">Newest First</button>
+                    <button class="sort-btn-sidebar" data-sort="oldest">Oldest First</button>
+                    <button class="sort-btn-sidebar" data-sort="alpha">Alphabetical</button>
+                </td>
+                <td>
+                    <h2 class="section-title">Articles</h2>
+                    <div class="articles-list" id="articles-container">
+                        <!-- Articles will be loaded here by JavaScript -->
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-            <div class="sort-section-sidebar">
-                <h2>Sort By</h2>
-                <button class="sort-btn-sidebar active" data-sort="newest">Newest First</button>
-                <button class="sort-btn-sidebar" data-sort="oldest">Oldest First</button>
-                <button class="sort-btn-sidebar" data-sort="alpha">Alphabetical</button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content" id="main-content">
-            <div class="container">
-                <header>
-                    <h1>nowhere writer</h1>
-                    <p class="tagline">articles, blogs, journals</p>
-                    <nav>
-                        <a href="index.html">Home</a>
-                        <a href="#about">About</a>
-                    </nav>
-                </header>
-
-                <h2 class="section-title">My Articles</h2>
-
-                <div class="articles-list" id="articles-container">
-                    <!-- Articles will be loaded here by JavaScript -->
-                </div>
-
-                <section id="about" class="about-section">
-                    <h2>About Me</h2>
-                    <p>
-                 I'm iris. i just write here for fun.
-                    </p>
-                    <p>
-                        Just me, my words, and the blank page. an html page that is.
-                    </p>
-                </section>
-
-                <footer>
-                    <p class="footer-note">All writing here is my own work, sources are given via hyperlinks.</p>
-                </footer>
-            </div>
-        </main>
+        <footer>
+            <p class="footer-note">All articles are contributed by our members. Sources are cited where applicable.</p>
+        </footer>
     </div>
 
     <script src="app.js"></script>
+    <script src="darkmode.js"></script>
 </body>
 </html>
 
