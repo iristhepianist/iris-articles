@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Editor - lambda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Verdana, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            padding: 20px;
+            font-size: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #FFA500;
+            color: #000000;
+            padding: 15px;
+            border: 2px solid #000000;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 11px;
+            color: #333;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: #DDDDDD;
+            border: 1px solid #000;
+            text-decoration: none;
+            color: #000;
+            font-size: 10px;
+        }
+
+        .nav-link:hover {
+            background: #CCCCCC;
+        }
+
+        .editor-container {
+            background: #F5F5F5;
+            border: 2px solid #000000;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #000000;
+            background: #FFFFFF;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 10px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .tag-input-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .tag-input-container input {
+            flex: 1;
+        }
+
+        .tag-input-container button {
+            padding: 8px 15px;
+            background: #FFA500;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .tag-input-container button:hover {
+            background: #FFB733;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag-item {
+            background: #DDDDDD;
+            padding: 3px 8px;
+            border: 1px solid #000;
+            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-item button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #cc0000;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 1px solid #000000;
+            cursor: pointer;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background: #FFA500;
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            background: #FFB733;
+        }
+
+        .btn-secondary {
+            background: #DDDDDD;
+            color: #000000;
+        }
+
+        .btn-secondary:hover {
+            background: #CCCCCC;
+        }
+
+        .output-container {
+            background: #F5F5F5;
+            border: 2px solid #000000;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .output-container h2 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #FFA500;
+        }
+
+        .json-output {
+            background: #FFFFCC;
+            color: #000000;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #FFA500;
+        }
+
+        .instructions {
+            background: #FFFFCC;
+            border: 2px solid #FFA500;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 11px;
+        }
+
+        .instructions h3 {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .error {
+            background: #ffcccc;
+            border: 1px solid #cc0000;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        .success {
+            background: #ccffcc;
+            border: 1px solid #00cc00;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ARTICLE EDITOR</h1>
+        <p>Create and add new articles to lambda</p>
+        <a href="index.html" class="nav-link">← BACK TO HOME</a>
+    </header>
+
+    <div class="instructions">
+        <h3>How to Use This Editor:</h3>
+        <ol>
+            <li>Fill in all the fields below to create your article</li>
+            <li>Click "Generate JSON" to see the formatted code</li>
+            <li>Copy the generated JSON from the output box</li>
+            <li>Open <code>articles.json</code> in a text editor</li>
+            <li>Paste your new article BEFORE the closing <code>]</code> bracket</li>
+            <li>Make sure to add a comma after the previous article</li>
+            <li>Save the file and refresh the website</li>
+        </ol>
+    </div>
+
+    <div id="message-container"></div>
+
+    <div class="editor-container">
+        <h2 style="margin-bottom: 15px; font-size: 16px;">Article Details</h2>
+
+        <div class="form-group">
+            <label for="article-id">Article ID*</label>
+            <input type="text" id="article-id" placeholder="e.g., my-article-2025">
+            <div class="help-text">Unique identifier (lowercase, use hyphens instead of spaces)</div>
+        </div>
+
+        <div class="form-group">
+            <label for="article-title">Title*</label>
+            <input type="text" id="article-title" placeholder="e.g., My Amazing Article">
+            <div class="help-text">The title of your article</div>
+        </div>
+
+        <div class="form-group">
+            <label for="article-category">Category*</label>
+            <select id="article-category">
+                <option value="Essay">Essay</option>
+                <option value="News">News</option>
+                <option value="Opinion">Opinion</option>
+                <option value="Review">Review</option>
+                <option value="Tutorial">Tutorial</option>
+                <option value="Other">Other</option>
+            </select>
+            <div class="help-text">Select the category that best fits your article</div>
+        </div>
+
+        <div class="form-group">
+            <label for="article-date">Date*</label>
+            <input type="date" id="article-date">
+            <div class="help-text">Publication date</div>
+        </div>
+
+        <div class="form-group">
+            <label>Tags</label>
+            <div class="tag-input-container">
+                <input type="text" id="tag-input" placeholder="e.g., technology">
+                <button type="button" onclick="addTag()">Add Tag</button>
+            </div>
+            <div class="help-text">Press Enter or click "Add Tag" to add multiple tags</div>
+            <div class="tag-list" id="tag-list"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="article-excerpt">Excerpt*</label>
+            <textarea id="article-excerpt" placeholder="A brief summary of your article (1-2 sentences)"></textarea>
+            <div class="help-text">Short description that appears on the main page</div>
+        </div>
+
+        <div class="form-group">
+            <label for="article-content">Content*</label>
+            <textarea id="article-content" placeholder="Write your full article here. You can use basic markdown:&#10;# Heading 1&#10;## Heading 2&#10;### Heading 3&#10;**bold text**&#10;*italic text*&#10;[link text](https://example.com)"></textarea>
+            <div class="help-text">Full article content (supports basic markdown)</div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="generateJSON()">Generate JSON</button>
+            <button class="btn-secondary" onclick="clearForm()">Clear Form</button>
+        </div>
+    </div>
+
+    <div class="output-container" id="output-section" style="display: none;">
+        <h2>Generated JSON</h2>
+        <div class="json-output" id="json-output"></div>
+        <div class="button-group" style="margin-top: 15px;">
+            <button class="btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="btn-secondary" onclick="downloadJSON()">Download as File</button>
+            <a class="btn-secondary" id="edit-on-github" href="https://github.com/iristhepianist/iris-articles/edit/main/articles.json" target="_blank" rel="noopener">Edit on GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        let tags = [];
+
+        // Set today's date as default
+        document.getElementById('article-date').valueAsDate = new Date();
+
+        // Allow Enter key to add tags
+        document.getElementById('tag-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+            }
+        });
+
+        function addTag() {
+            const input = document.getElementById('tag-input');
+            const tag = input.value.trim().toLowerCase();
+            
+            if (tag && !tags.includes(tag)) {
+                tags.push(tag);
+                updateTagList();
+                input.value = '';
+            }
+        }
+
+        function removeTag(tag) {
+            tags = tags.filter(t => t !== tag);
+            updateTagList();
+        }
+
+        function updateTagList() {
+            const tagList = document.getElementById('tag-list');
+            tagList.innerHTML = tags.map(tag => 
+                `<div class="tag-item">${tag}<button onclick="removeTag('${tag}')">×</button></div>`
+            ).join('');
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function validateForm() {
+            const id = document.getElementById('article-id').value.trim();
+            const title = document.getElementById('article-title').value.trim();
+            const category = document.getElementById('article-category').value;
+            const date = document.getElementById('article-date').value;
+            const excerpt = document.getElementById('article-excerpt').value.trim();
+            const content = document.getElementById('article-content').value.trim();
+
+            const errors = [];
+
+            if (!id) errors.push('Article ID is required');
+            if (!/^[a-z0-9-]+$/.test(id)) errors.push('Article ID must be lowercase with hyphens only');
+            if (!title) errors.push('Title is required');
+            if (!date) errors.push('Date is required');
+            if (!excerpt) errors.push('Excerpt is required');
+            if (!content) errors.push('Content is required');
+
+            return errors;
+        }
+
+        function generateJSON() {
+            const errors = validateForm();
+            
+            if (errors.length > 0) {
+                showMessage('Please fix the following errors:<br>• ' + errors.join('<br>• '), 'error');
+                return;
+            }
+
+            const article = {
+                id: document.getElementById('article-id').value.trim(),
+                title: document.getElementById('article-title').value.trim(),
+                category: document.getElementById('article-category').value,
+                date: document.getElementById('article-date').value,
+                tags: tags.length > 0 ? tags : undefined,
+                excerpt: document.getElementById('article-excerpt').value.trim(),
+                content: document.getElementById('article-content').value.trim()
+            };
+
+            // Remove undefined fields
+            Object.keys(article).forEach(key => {
+                if (article[key] === undefined) {
+                    delete article[key];
+                }
+            });
+
+            const jsonString = JSON.stringify(article, null, 2);
+            
+            document.getElementById('json-output').textContent = jsonString;
+            document.getElementById('output-section').style.display = 'block';
+            
+            showMessage('JSON generated successfully! Copy it and add it to articles.json', 'success');
+            
+            // Scroll to output
+            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard() {
+            const jsonText = document.getElementById('json-output').textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(jsonText).then(() => {
+                    showMessage('JSON copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(jsonText);
+                });
+            } else {
+                fallbackCopy(jsonText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showMessage('JSON copied to clipboard!', 'success');
+            } catch (err) {
+                showMessage('Please manually copy the JSON text', 'error');
+            }
+            
+            document.body.removeChild(textarea);
+        }
+
+        function downloadJSON() {
+            const jsonText = document.getElementById('json-output').textContent;
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const id = document.getElementById('article-id').value.trim() || 'article';
+            
+            a.href = url;
+            a.download = `${id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('JSON file downloaded!', 'success');
+        }
+
+        function clearForm() {
+            if (confirm('Are you sure you want to clear the form? All data will be lost.')) {
+                document.getElementById('article-id').value = '';
+                document.getElementById('article-title').value = '';
+                document.getElementById('article-category').value = 'Essay';
+                document.getElementById('article-date').valueAsDate = new Date();
+                document.getElementById('article-excerpt').value = '';
+                document.getElementById('article-content').value = '';
+                tags = [];
+                updateTagList();
+                document.getElementById('output-section').style.display = 'none';
+                showMessage('Form cleared', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
