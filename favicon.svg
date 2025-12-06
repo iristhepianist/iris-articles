@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
   <rect width="128" height="128" rx="16" fill="#FFA500" />
-  <text x="50%" y="52%" font-family="Verdana, Arial, sans-serif" font-size="74" fill="#000000" text-anchor="middle" dominant-baseline="middle">λ</text>
+  <text x="50%" y="54%" font-family="Verdana, Arial, sans-serif" font-size="74" fill="#000000" text-anchor="middle" dominant-baseline="middle">λ</text>
 </svg>
