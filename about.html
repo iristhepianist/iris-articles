@@ -84,6 +84,7 @@
         }
     </style>
     <link rel="stylesheet" href="darkmode.css">
+    <link rel="stylesheet" href="newsletter.css">
     <script src="darkmode.js"></script>
 </head>
 <body>
@@ -120,6 +121,24 @@
         <footer>
             <p class="footer-note"><a href="privacy.html">Privacy Policy</a></p>
         </footer>
+
+        <!-- Newsletter Subscription Section -->
+        <div style="background: #FFF3CD; border: 2px solid #FFA500; padding: 20px; margin: 20px auto; max-width: 760px;">
+            <h2 style="font-size: 14px; margin: 0 0 10px 0; font-weight: bold;">📧 Subscribe to Newsletter</h2>
+            <p style="font-size: 11px; margin: 0 0 15px 0; color: #333;">Get notified when we publish new articles and updates!</p>
+            <form class="newsletter-form" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;">
+                <input type="email" name="email" placeholder="your@email.com" required 
+                       style="flex: 1; min-width: 200px; padding: 8px; border: 1px solid #000; font-size: 11px; font-family: Verdana, Arial, sans-serif;">
+                <input type="text" name="name" placeholder="Your name (optional)" 
+                       style="flex: 1; min-width: 150px; padding: 8px; border: 1px solid #000; font-size: 11px; font-family: Verdana, Arial, sans-serif;">
+                <button type="submit" 
+                        style="padding: 8px 20px; background: #FFA500; border: 1px solid #000; cursor: pointer; font-size: 11px; font-weight: bold; font-family: Verdana, Arial, sans-serif;">
+                    Subscribe
+                </button>
+                <div class="newsletter-message" style="display: none; width: 100%; padding: 8px; margin-top: 5px; font-size: 11px; border: 1px solid #000;"></div>
+            </form>
+        </div>
     </div>
+    <script src="newsletter.js"></script>
 </body>
 </html>

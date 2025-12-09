@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writer Dashboard - Lambda Journalism</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+            border-radius: 12px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #212529;
+            border: 1px solid #212529;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg, #fff);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-top: 0;
+            color: #ffc107;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .card-btn:hover {
+            background: #e0a800;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg, #fff);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffc107;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        .permission-badge {
+            padding: 6px 12px;
+            background: #fff3cd;
+            color: #856404;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .article-list {
+            margin-top: 15px;
+        }
+
+        .article-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .article-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-submitted {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-published {
+            background: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <h1>✍️ Writer Dashboard</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Create and manage your articles</p>
+            </div>
+            <div class="user-info">
+                <div class="role" id="userRole">Loading...</div>
+                <div class="login-time" id="loginTime">Login time: --</div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="draftCount">0</div>
+                <div class="stat-label">Drafts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="submittedCount">0</div>
+                <div class="stat-label">Submitted</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="publishedCount">0</div>
+                <div class="stat-label">Published</div>
+            </div>
+        </div>
+
+        <!-- Your Permissions -->
+        <div>
+            <h2 class="section-title">🔑 Your Permissions</h2>
+            <div class="dashboard-card">
+                <p><strong>As a Writer, you can:</strong></p>
+                <div style="margin-top: 15px;">
+                    <span class="permission-badge">📝 Create New Articles</span>
+                    <span class="permission-badge">💾 Save Drafts</span>
+                    <span class="permission-badge">📤 Submit for Review</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Features -->
+        <h2 class="section-title">🎯 Your Tools</h2>
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3><span>✍️</span> Create Article</h3>
+                <p>Write a new article</p>
+                <div class="card-actions">
+                    <a href="editor.html" class="card-btn">New Article</a>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h3><span>💾</span> My Drafts</h3>
+                <p>View and edit your drafts</p>
+                <div class="card-actions">
+                    <button class="card-btn" onclick="viewDrafts()">View Drafts</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h3><span>📤</span> Submissions</h3>
+                <p>Track submitted articles</p>
+                <div class="card-actions">
+                    <button class="card-btn" onclick="viewSubmissions()">View Submissions</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h3><span>📚</span> Published Work</h3>
+                <p>See your published articles</p>
+                <div class="card-actions">
+                    <button class="card-btn" onclick="viewPublished()">View Published</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Articles -->
+        <div>
+            <h2 class="section-title">📄 My Recent Articles</h2>
+            <div class="dashboard-card">
+                <div id="articleList" class="article-list">
+                    <p style="color: #666; font-style: italic;">No articles yet. Create your first article!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const authSystem = new AuthSystem();
+
+        function checkAuth() {
+            const session = authSystem.getSession();
+            if (!session) {
+                alert('Your session has expired. Please log in again.');
+                window.location.href = 'admin-login.html';
+                return null;
+            }
+            
+            if (session.role !== 'writer') {
+                alert('Access denied. This page is for Writers only.');
+                window.location.href = 'admin-login.html';
+                return null;
+            }
+            
+            return session;
+        }
+
+        const session = checkAuth();
+        if (session) {
+            document.getElementById('userRole').textContent = session.roleName;
+            document.getElementById('loginTime').textContent = 'Login: ' + new Date(session.loginTime).toLocaleString();
+            loadStats();
+            loadArticles();
+        }
+
+        function loadStats() {
+            const articles = JSON.parse(localStorage.getItem('lambda_articles') || '[]');
+            const drafts = articles.filter(a => !a.submitted && !a.published);
+            const submitted = articles.filter(a => a.submitted && !a.published);
+            const published = articles.filter(a => a.published);
+            
+            document.getElementById('draftCount').textContent = drafts.length;
+            document.getElementById('submittedCount').textContent = submitted.length;
+            document.getElementById('publishedCount').textContent = published.length;
+        }
+
+        function loadArticles() {
+            const articles = JSON.parse(localStorage.getItem('lambda_articles') || '[]');
+            const listDiv = document.getElementById('articleList');
+            
+            if (articles.length === 0) {
+                listDiv.innerHTML = '<p style="color: #666; font-style: italic;">No articles yet. Create your first article!</p>';
+                return;
+            }
+
+            let html = '';
+            articles.slice(0, 5).forEach(article => {
+                const status = article.published ? 'published' : (article.submitted ? 'submitted' : 'draft');
+                const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+                html += `
+                    <div class="article-item">
+                        <div>
+                            <strong>${article.title || 'Untitled'}</strong>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                ${new Date(article.createdAt || Date.now()).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <span class="article-status status-${status}">${statusLabel}</span>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                authSystem.logout();
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        function viewDrafts() { alert('Draft manager - Coming soon!'); }
+        function viewSubmissions() { alert('Submission tracker - Coming soon!'); }
+        function viewPublished() { window.location.href = 'index.html'; }
+    </script>
+</body>
+</html>

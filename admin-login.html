@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Lambda Journalism</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 40px;
+            background: var(--card-bg, #fff);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-container .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color, #333);
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: var(--input-bg, #fff);
+            color: var(--text-color, #333);
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .login-btn:hover {
+            background: #0056b3;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+            display: block;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+            display: block;
+        }
+
+        .message.warning {
+            background: #ffeaa7;
+            color: #d63031;
+            border: 1px solid #fdcb6e;
+            display: block;
+        }
+
+        .security-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .security-info strong {
+            color: #007bff;
+        }
+
+        .attempts-remaining {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .login-container {
+                background: #2b2b2b;
+            }
+            
+            .security-info {
+                background: #1a1a1a;
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 Admin Login</h1>
+        <p class="subtitle">Secure access for Lambda Journalism staff</p>
+
+        <div id="messageDiv" class="message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="roleSelect">Select Role</label>
+                <select id="roleSelect" required>
+                    <option value="">-- Choose your role --</option>
+                    <option value="editor-in-chief">Editor-in-Chief</option>
+                    <option value="managing-editor">Managing Editor</option>
+                    <option value="section-editor">Section Editor</option>
+                    <option value="writer">Writer</option>
+                    <option value="copy-editor">Copy Editor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
+            
+            <div class="attempts-remaining" id="attemptsDiv" style="display: none;"></div>
+        </form>
+
+        <div class="security-info">
+            <strong>🔒 Security Notice:</strong> After 5 failed login attempts, your account will be locked for 15 minutes to prevent unauthorized access.
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">← Back to Homepage</a>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const authSystem = new AuthSystem();
+        const loginForm = document.getElementById('loginForm');
+        const roleSelect = document.getElementById('roleSelect');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const messageDiv = document.getElementById('messageDiv');
+        const attemptsDiv = document.getElementById('attemptsDiv');
+
+        // Check if already logged in
+        const session = authSystem.getSession();
+        if (session) {
+            redirectToDashboard(session.role);
+        }
+
+        // Check if locked out on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const lockout = authSystem.isLockedOut();
+            if (lockout.locked) {
+                const minutesLeft = Math.ceil((lockout.until - new Date()) / 60000);
+                showMessage(`Account locked due to too many failed attempts. Try again in ${minutesLeft} minute(s).`, 'error');
+                loginBtn.disabled = true;
+                
+                // Re-enable after lockout expires
+                setTimeout(() => {
+                    location.reload();
+                }, (lockout.until - new Date()));
+            } else {
+                // Show remaining attempts if any have been used
+                updateAttemptsDisplay();
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const role = roleSelect.value;
+            const password = passwordInput.value;
+
+            if (!role || !password) {
+                showMessage('Please select a role and enter your password.', 'error');
+                return;
+            }
+
+            // Disable button during authentication
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Authenticating...';
+
+            try {
+                const result = await authSystem.authenticate(role, password);
+
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    setTimeout(() => {
+                        redirectToDashboard(role);
+                    }, 500);
+                } else {
+                    showMessage(result.message, 'error');
+                    
+                    if (result.locked) {
+                        loginBtn.disabled = true;
+                        loginBtn.textContent = 'Account Locked';
+                        // Auto-reload after lockout expires
+                        setTimeout(() => {
+                            location.reload();
+                        }, authSystem.lockoutDuration);
+                    } else {
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Login';
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                        
+                        // Show remaining attempts
+                        if (result.remaining !== undefined) {
+                            attemptsDiv.textContent = `⚠️ ${result.remaining} attempt(s) remaining`;
+                            attemptsDiv.style.display = 'block';
+                            attemptsDiv.style.color = result.remaining <= 2 ? '#d63031' : '#666';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('An error occurred during login. Please try again.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+
+        function showMessage(msg, type) {
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+
+        function updateAttemptsDisplay() {
+            const remaining = authSystem.getRemainingAttempts();
+            if (remaining < 5) {
+                attemptsDiv.textContent = `${remaining} attempt(s) remaining`;
+                attemptsDiv.style.display = 'block';
+                attemptsDiv.style.color = remaining <= 2 ? '#d63031' : '#666';
+            }
+        }
+
+        function redirectToDashboard(role) {
+            // Redirect to role-specific admin dashboard
+            const dashboardMap = {
+                'editor-in-chief': 'admin-editor-chief.html',
+                'managing-editor': 'admin-managing-editor.html',
+                'section-editor': 'admin-section-editor.html',
+                'writer': 'admin-writer.html',
+                'copy-editor': 'admin-copy-editor.html'
+            };
+
+            const dashboard = dashboardMap[role];
+            if (dashboard) {
+                window.location.href = dashboard;
+            } else {
+                showMessage('Dashboard not found for this role.', 'error');
+            }
+        }
+
+        // Auto-focus password field when role is selected
+        roleSelect.addEventListener('change', () => {
+            if (roleSelect.value) {
+                passwordInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

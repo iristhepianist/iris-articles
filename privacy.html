@@ -34,10 +34,11 @@
                 <h3>Information Collection and Use</h3>
                 
                 <h4>Website</h4>
-                <p>Our website is a static site hosted on GitHub Pages. We do not collect, store, or process any personal information. The website uses:</p>
+                <p>Our website is a static site hosted on GitHub Pages. We collect minimal information:</p>
                 <ul>
                     <li><strong>No cookies</strong> - We don't use tracking cookies or analytics</li>
-                    <li><strong>LocalStorage</strong> - Only to remember your dark mode preference (stored locally in your browser)</li>
+                    <li><strong>LocalStorage</strong> - Only to remember your dark mode preference and newsletter subscription (stored locally in your browser)</li>
+                    <li><strong>Newsletter subscriptions</strong> - If you subscribe to our newsletter, your email address and optional name are stored locally in your browser's localStorage. This data is not transmitted to external servers unless you explicitly export it</li>
                     <li><strong>No user accounts</strong> - We don't require registration or login</li>
                 </ul>
 
@@ -63,7 +64,8 @@
             <section>
                 <h3>Data Storage</h3>
                 <ul>
-                    <li><strong>Website:</strong> Dark mode preference is stored in your browser's localStorage. No data is sent to our servers</li>
+                    <li><strong>Website:</strong> Dark mode preference and newsletter subscriptions are stored in your browser's localStorage. No data is sent to our servers automatically</li>
+                    <li><strong>Newsletter:</strong> Email addresses and optional names are stored locally in your browser only. Editors can export subscriber lists manually to send newsletters via third-party email services</li>
                     <li><strong>Mobile App:</strong> All cached data is stored locally on your device using Android SharedPreferences. We do not sync or backup your data to any cloud service</li>
                 </ul>
             </section>
@@ -92,12 +94,13 @@
                 <h3>Data Deletion</h3>
                 
                 <h4>Website</h4>
-                <p>To clear your dark mode preference:</p>
+                <p>To clear your dark mode preference and newsletter subscription:</p>
                 <ol>
                     <li>Open your browser's developer tools (F12)</li>
                     <li>Go to the "Application" or "Storage" tab</li>
-                    <li>Find "Local Storage" and delete the item for this site</li>
+                    <li>Find "Local Storage" and delete the items for this site (look for "darkMode" and "lambda_newsletter_subscribers")</li>
                     <li>Or simply use your browser's "Clear browsing data" feature</li>
+                    <li>You can also unsubscribe by clicking the unsubscribe link in any newsletter email</li>
                 </ol>
 
                 <h4>Mobile App</h4>

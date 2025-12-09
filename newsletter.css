@@ -1,0 +1,162 @@
+/* Newsletter Form Styles */
+.newsletter-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.newsletter-form input[type="email"],
+.newsletter-form input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px;
+    border: 1px solid #000;
+    font-size: 11px;
+    font-family: Verdana, Arial, sans-serif;
+    background: #FFF;
+}
+
+.newsletter-form button[type="submit"] {
+    padding: 8px 20px;
+    background: #FFA500;
+    border: 1px solid #000;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    font-family: Verdana, Arial, sans-serif;
+    color: #000;
+}
+
+.newsletter-form button[type="submit"]:hover {
+    background: #FFB733;
+}
+
+.newsletter-form button[type="submit"]:disabled {
+    background: #CCC;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.newsletter-message {
+    display: none;
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 11px;
+    border: 1px solid #000;
+    font-family: Verdana, Arial, sans-serif;
+}
+
+.newsletter-message.success {
+    background: #CCFFCC;
+    border-color: #00CC00;
+    color: #006600;
+}
+
+.newsletter-message.error {
+    background: #FFCCCC;
+    border-color: #CC0000;
+    color: #660000;
+}
+
+.newsletter-container {
+    background: #FFF3CD;
+    border: 2px solid #FFA500;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 760px;
+}
+
+.newsletter-container h2 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+
+.newsletter-container p {
+    font-size: 11px;
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+/* Newsletter Panel in Editor */
+#newsletter-panel {
+    background: #FFF3CD;
+    border: 2px solid #FFA500;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#newsletter-panel h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #000;
+}
+
+#newsletter-panel h3 {
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+#subscriber-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #FFF;
+    border: 1px solid #000;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#subscriber-list p {
+    color: #666;
+    font-size: 11px;
+    margin: 0;
+}
+
+.subscriber-item {
+    padding: 8px;
+    border-bottom: 1px solid #EEE;
+    font-size: 11px;
+}
+
+.subscriber-item strong {
+    color: #000;
+}
+
+.subscriber-item span {
+    color: #666;
+}
+
+#email-template-output {
+    margin-top: 15px;
+}
+
+#email-html-preview {
+    background: #FFF;
+    border: 1px solid #000;
+    padding: 15px;
+    margin-bottom: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .newsletter-form {
+        flex-direction: column;
+    }
+    
+    .newsletter-form input[type="email"],
+    .newsletter-form input[type="text"],
+    .newsletter-form button[type="submit"] {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .newsletter-container {
+        padding: 15px;
+        margin: 15px 0;
+    }
+}

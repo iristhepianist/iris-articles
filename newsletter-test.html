@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Test Page - lambda</title>
+    <link rel="stylesheet" href="newsletter.css">
+    <style>
+        body {
+            font-family: Verdana, Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #FFA500;
+            border-bottom: 3px solid #FFA500;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 16px;
+            margin-top: 0;
+        }
+        .info {
+            background: #FFF3CD;
+            border: 1px solid #FFA500;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #FFA500;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #FFB733;
+        }
+        .results {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>📧 Newsletter Feature - Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Subscribe to Newsletter</h2>
+        <div class="info">Test the subscription form below. Try subscribing with different emails.</div>
+        <form class="newsletter-form">
+            <input type="email" name="email" placeholder="test@example.com" required>
+            <input type="text" name="name" placeholder="Test User">
+            <button type="submit">Subscribe</button>
+            <div class="newsletter-message"></div>
+        </form>
+    </div>
+
+    <div class="test-section">
+        <h2>2. View Subscribers</h2>
+        <div class="info">Click the button below to see all current subscribers.</div>
+        <button onclick="showSubscribers()">Show Subscribers</button>
+        <button onclick="clearSubscribers()">Clear All Subscribers</button>
+        <div class="results" id="subscriber-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Export Data</h2>
+        <div class="info">Test the export functionality.</div>
+        <button onclick="exportJSON()">Export as JSON</button>
+        <button onclick="exportCSV()">Export as CSV</button>
+        <div class="results" id="export-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Unsubscribe</h2>
+        <div class="info">Enter an email to unsubscribe.</div>
+        <input type="email" id="unsubscribe-email" placeholder="email@example.com" style="padding: 8px; border: 1px solid #000; font-size: 12px; margin-right: 10px;">
+        <button onclick="testUnsubscribe()">Unsubscribe</button>
+        <div class="results" id="unsubscribe-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Email Validation Test</h2>
+        <div class="info">Test various email formats to check validation.</div>
+        <div style="margin: 10px 0;">
+            <button onclick="testEmail('valid@email.com')">Test: valid@email.com</button>
+            <button onclick="testEmail('invalid.email')">Test: invalid.email</button>
+            <button onclick="testEmail('test@test@test.com')">Test: test@test@test.com</button>
+            <button onclick="testEmail('')">Test: (empty)</button>
+        </div>
+        <div class="results" id="validation-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Test Email Sending</h2>
+        <div class="info">Test email generation and sending functionality. Add some test subscribers first!</div>
+        <div style="margin: 10px 0;">
+            <input type="text" id="test-article-title" placeholder="Test Article Title" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #000; font-size: 12px;">
+            <textarea id="test-article-excerpt" placeholder="Test article excerpt (1-2 sentences)" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #000; font-size: 12px; min-height: 60px;"></textarea>
+            <input type="text" id="test-article-id" placeholder="test-article-id" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #000; font-size: 12px;">
+        </div>
+        <div style="margin: 10px 0;">
+            <button onclick="testEmailClient()">Open Email Client (BCC All)</button>
+            <button onclick="testIndividualEmails()">Generate Individual Email Links</button>
+        </div>
+        <div class="results" id="email-test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Test Checklist</h2>
+        <div style="font-size: 12px;">
+            <input type="checkbox" id="check1"> Subscribe with a valid email<br>
+            <input type="checkbox" id="check2"> Try subscribing with the same email again (should fail)<br>
+            <input type="checkbox" id="check3"> View the subscriber list<br>
+            <input type="checkbox" id="check4"> Export subscribers as JSON<br>
+            <input type="checkbox" id="check5"> Export subscribers as CSV<br>
+            <input type="checkbox" id="check6"> Test unsubscribe functionality<br>
+            <input type="checkbox" id="check7"> Test invalid email validation<br>
+            <input type="checkbox" id="check8"> Open editor.html and view subscribers there<br>
+            <input type="checkbox" id="check9"> Generate an email template in editor<br>
+            <input type="checkbox" id="check10"> Clear all subscribers and verify empty state<br>
+            <input type="checkbox" id="check11"> Test email client integration (BCC method)<br>
+            <input type="checkbox" id="check12"> Test individual email generation<br>
+        </div>
+    </div>
+
+    <script src="newsletter.js"></script>
+    <script>
+        function showSubscribers() {
+            const subscribers = newsletterManager.getSubscribers();
+            const resultsDiv = document.getElementById('subscriber-results');
+            
+            if (subscribers.length === 0) {
+                resultsDiv.textContent = 'No subscribers found.';
+            } else {
+                resultsDiv.textContent = JSON.stringify(subscribers, null, 2);
+            }
+        }
+
+        function clearSubscribers() {
+            if (confirm('Are you sure you want to clear ALL subscribers? This cannot be undone.')) {
+                localStorage.removeItem('lambda_newsletter_subscribers');
+                newsletterManager.subscribers = [];
+                document.getElementById('subscriber-results').textContent = 'All subscribers cleared.';
+                alert('All subscribers have been removed.');
+            }
+        }
+
+        function exportJSON() {
+            const json = newsletterManager.exportSubscribers();
+            document.getElementById('export-results').textContent = json;
+        }
+
+        function exportCSV() {
+            const csv = newsletterManager.exportCSV();
+            document.getElementById('export-results').textContent = csv;
+        }
+
+        function testUnsubscribe() {
+            const email = document.getElementById('unsubscribe-email').value;
+            const result = newsletterManager.unsubscribe(email);
+            document.getElementById('unsubscribe-results').textContent = JSON.stringify(result, null, 2);
+        }
+
+        function testEmail(email) {
+            const isValid = newsletterManager.validateEmail(email);
+            const resultsDiv = document.getElementById('validation-results');
+            resultsDiv.textContent = `Email: "${email}"\nValid: ${isValid}`;
+        }
+
+        function testEmailClient() {
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                document.getElementById('email-test-results').textContent = 'Error: No subscribers found. Add some subscribers first!';
+                return;
+            }
+
+            const title = document.getElementById('test-article-title').value || 'Test Article';
+            const excerpt = document.getElementById('test-article-excerpt').value || 'This is a test article excerpt.';
+            const articleId = document.getElementById('test-article-id').value || 'test-article';
+            const articleUrl = `https://iristhepianist.github.io/iris-articles/article.html?id=${articleId}`;
+
+            const subject = `New Article: ${title} - lambda`;
+            const body = `Hi there!
+
+We've just published a new article on lambda:
+
+${title}
+
+${excerpt}
+
+Read the full article here: ${articleUrl}
+
+---
+To unsubscribe, visit: https://iristhepianist.github.io/iris-articles/index.html?unsubscribe=YOUR_ID
+
+lambda - youth journalism`;
+
+            const emailList = subscribers.map(sub => sub.email).join(',');
+            const mailtoLink = `mailto:?bcc=${encodeURIComponent(emailList)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            document.getElementById('email-test-results').innerHTML = `
+                <strong>Opening email client with ${subscribers.length} subscribers in BCC...</strong><br><br>
+                <small>If your email client doesn't open automatically, use this link:</small><br>
+                <a href="${mailtoLink}" style="word-break: break-all; font-size: 10px;">Click here to open email</a>
+            `;
+
+            // Open email client
+            window.location.href = mailtoLink;
+        }
+
+        function testIndividualEmails() {
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                document.getElementById('email-test-results').textContent = 'Error: No subscribers found. Add some subscribers first!';
+                return;
+            }
+
+            const title = document.getElementById('test-article-title').value || 'Test Article';
+            const excerpt = document.getElementById('test-article-excerpt').value || 'This is a test article excerpt.';
+            const articleId = document.getElementById('test-article-id').value || 'test-article';
+            const articleUrl = `https://iristhepianist.github.io/iris-articles/article.html?id=${articleId}`;
+
+            let emailsList = `<strong>Individual Email Links (${subscribers.length} subscribers):</strong><br><br>`;
+            
+            subscribers.forEach((sub, index) => {
+                const unsubscribeUrl = `https://iristhepianist.github.io/iris-articles/index.html?unsubscribe=${sub.id}`;
+                const greeting = sub.name ? `Hi ${sub.name}` : 'Hi there';
+                
+                const subject = `New Article: ${title} - lambda`;
+                const body = `${greeting}!
+
+We've just published a new article on lambda:
+
+${title}
+
+${excerpt}
+
+Read the full article here: ${articleUrl}
+
+---
+To unsubscribe, click here: ${unsubscribeUrl}
+
+lambda - youth journalism`;
+
+                const mailtoLink = `mailto:${sub.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                emailsList += `${index + 1}. <a href="${mailtoLink}" style="color: #0000FF;">${sub.email}</a> ${sub.name ? `(${sub.name})` : ''}<br>`;
+            });
+
+            document.getElementById('email-test-results').innerHTML = emailsList;
+        }
+
+        // Display initial state
+        window.addEventListener('load', () => {
+            showSubscribers();
+        });
+    </script>
+</body>
+</html>

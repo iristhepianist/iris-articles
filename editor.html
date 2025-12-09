@@ -6,6 +6,7 @@
     <title>Article Editor - lambda</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="shortcut icon" href="favicon.svg">
+    <link rel="stylesheet" href="newsletter.css">
     <style>
         * {
             margin: 0;
@@ -262,7 +263,57 @@
         <h1>ARTICLE EDITOR</h1>
         <p>Create and add new articles to lambda</p>
         <a href="index.html" class="nav-link">← BACK TO HOME</a>
+        <button class="nav-link" onclick="toggleNewsletterPanel()" style="margin-left: 10px; cursor: pointer;">
+            📧 NEWSLETTER (<span id="subscriber-count">0</span>)
+        </button>
     </header>
+
+    <!-- Newsletter Management Panel -->
+    <div id="newsletter-panel" style="display: none; background: #FFF3CD; border: 2px solid #FFA500; padding: 20px; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin-bottom: 15px;">📧 Newsletter Management</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 13px; margin-bottom: 10px;">Subscribers (<span id="subscriber-list-count">0</span>)</h3>
+            <div id="subscriber-list" style="max-height: 200px; overflow-y: auto; background: #FFF; border: 1px solid #000; padding: 10px; margin-bottom: 10px;">
+                <p style="color: #666; font-size: 11px;">No subscribers yet.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="downloadSubscribersCSV()">Export as CSV</button>
+                <button class="btn-secondary" onclick="downloadSubscribersJSON()">Export as JSON</button>
+                <button class="btn-secondary" onclick="refreshSubscriberList()">Refresh</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 13px; margin-bottom: 10px;">Generate Email Notification</h3>
+            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">
+                After generating an article JSON above, click below to create an email template for your subscribers.
+            </p>
+            <button class="btn-primary" onclick="generateEmailTemplate()">Generate Email Template</button>
+        </div>
+
+        <div id="email-template-output" style="display: none; margin-top: 15px;">
+            <h3 style="font-size: 13px; margin-bottom: 10px;">Email Template</h3>
+            <div style="background: #FFF; border: 1px solid #000; padding: 15px; margin-bottom: 10px; max-height: 400px; overflow-y: auto;" id="email-html-preview"></div>
+            <button class="btn-primary" onclick="copyEmailTemplate()">Copy Email HTML</button>
+            <button class="btn-secondary" onclick="downloadEmailTemplate()">Download HTML</button>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3 style="font-size: 13px; margin-bottom: 10px;">📨 Send to Subscribers</h3>
+            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">
+                <strong>Recommended:</strong> Auto-send individual emails (personalized, no manual work!)
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn-primary" onclick="autoSendIndividualEmails()" style="font-weight: bold;">🚀 Auto-Send Individual Emails</button>
+                <button class="btn-secondary" onclick="exportForSendGrid()">SendGrid</button>
+                <button class="btn-secondary" onclick="sendViaDefaultEmail()">Email Client (BCC)</button>
+                <button class="btn-secondary" onclick="exportForMailchimp()">Mailchimp</button>
+            </div>
+            <div id="email-send-output" style="display: none; margin-top: 15px; background: #FFF; border: 1px solid #000; padding: 15px; max-height: 400px; overflow-y: auto;"></div>
+            <div id="auto-send-progress" style="display: none; margin-top: 15px; background: #E8F4F8; border: 2px solid #FFA500; padding: 15px;"></div>
+        </div>
+    </div>
 
     <div class="instructions">
         <h3>How to Use This Editor:</h3>
@@ -515,7 +566,499 @@
                 showMessage('Form cleared', 'success');
             }
         }
+
+        // Newsletter Management Functions
+        function toggleNewsletterPanel() {
+            const panel = document.getElementById('newsletter-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                refreshSubscriberList();
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function refreshSubscriberList() {
+            if (typeof newsletterManager === 'undefined') {
+                console.error('Newsletter manager not loaded');
+                return;
+            }
+
+            const subscribers = newsletterManager.getSubscribers();
+            const count = subscribers.length;
+            
+            document.getElementById('subscriber-count').textContent = count;
+            document.getElementById('subscriber-list-count').textContent = count;
+            
+            const listDiv = document.getElementById('subscriber-list');
+            
+            if (count === 0) {
+                listDiv.innerHTML = '<p style="color: #666; font-size: 11px;">No subscribers yet.</p>';
+            } else {
+                listDiv.innerHTML = subscribers.map(sub => `
+                    <div style="padding: 8px; border-bottom: 1px solid #EEE; font-size: 11px;">
+                        <strong>${sub.email}</strong>
+                        ${sub.name ? `<span style="color: #666;"> - ${sub.name}</span>` : ''}
+                        <br>
+                        <span style="color: #999; font-size: 10px;">Subscribed: ${new Date(sub.subscribedAt).toLocaleDateString()}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function downloadSubscribersCSV() {
+            if (typeof newsletterManager === 'undefined') return;
+            
+            const csv = newsletterManager.exportCSV();
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = url;
+            a.download = `lambda-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('Subscribers exported as CSV', 'success');
+        }
+
+        function downloadSubscribersJSON() {
+            if (typeof newsletterManager === 'undefined') return;
+            
+            const json = newsletterManager.exportSubscribers();
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            a.href = url;
+            a.download = `lambda-subscribers-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('Subscribers exported as JSON', 'success');
+        }
+
+        function generateEmailTemplate() {
+            // Get the current article data from the form
+            const title = document.getElementById('article-title').value.trim();
+            const excerpt = document.getElementById('article-excerpt').value.trim();
+            const category = document.getElementById('article-category').value;
+            const date = document.getElementById('article-date').value;
+            const articleId = document.getElementById('article-id').value.trim();
+            
+            if (!title || !excerpt || !articleId) {
+                showMessage('Please generate an article first before creating an email template', 'error');
+                return;
+            }
+
+            const articleUrl = `https://iristhepianist.github.io/iris-articles/article.html?id=${articleId}`;
+            
+            const emailHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Article: ${title}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Verdana, Arial, sans-serif; background-color: #f5f5f5;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table role="presentation" style="width: 600px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; border: 2px solid #000000;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #FFA500; padding: 20px; border-bottom: 2px solid #000000;">
+                            <h1 style="margin: 0; font-size: 24px; color: #000000;">
+                                <span style="font-size: 28px;">λ</span> lambda
+                            </h1>
+                            <p style="margin: 5px 0 0 0; font-size: 11px; color: #000000;">youth journalism</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding: 30px 20px;">
+                            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: #000000;">
+                                New Article Published! 📰
+                            </h2>
+                            
+                            <p style="margin: 0 0 15px 0; font-size: 12px; color: #000000; line-height: 1.6;">
+                                We've just published a new article on lambda. Check it out!
+                            </p>
+                            
+                            <!-- Article Card -->
+                            <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f9f9f9; border: 1px solid #cccccc; margin: 20px 0;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <div style="font-size: 10px; color: #666; margin-bottom: 8px;">
+                                            <strong>${category}</strong> • ${new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </div>
+                                        <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #0000FF;">
+                                            ${title}
+                                        </h3>
+                                        <p style="margin: 0 0 15px 0; font-size: 12px; color: #333; line-height: 1.5;">
+                                            ${excerpt}
+                                        </p>
+                                        <a href="${articleUrl}" style="display: inline-block; padding: 10px 20px; background-color: #FFA500; color: #000000; text-decoration: none; border: 1px solid #000000; font-size: 12px; font-weight: bold;">
+                                            Read Full Article →
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 20px 0 0 0; font-size: 11px; color: #666; line-height: 1.6;">
+                                Thank you for being a subscriber! We'll keep you updated when new content is published.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px; background-color: #eeeeee; border-top: 1px solid #000000;">
+                            <p style="margin: 0 0 10px 0; font-size: 10px; color: #666; text-align: center;">
+                                © ${new Date().getFullYear()} lambda - youth journalism
+                            </p>
+                            <p style="margin: 0; font-size: 10px; color: #666; text-align: center;">
+                                <a href="https://iristhepianist.github.io/iris-articles/index.html?unsubscribe={{SUBSCRIBER_ID}}" style="color: #0000FF; text-decoration: underline;">
+                                    Unsubscribe
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+            document.getElementById('email-html-preview').innerHTML = emailHTML;
+            document.getElementById('email-template-output').style.display = 'block';
+            showMessage('Email template generated! Copy or download it below.', 'success');
+            
+            // Scroll to template
+            document.getElementById('email-template-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyEmailTemplate() {
+            const emailHTML = document.getElementById('email-html-preview').innerHTML;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(emailHTML).then(() => {
+                    showMessage('Email template copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(emailHTML);
+                });
+            } else {
+                fallbackCopy(emailHTML);
+            }
+        }
+
+        function downloadEmailTemplate() {
+            const emailHTML = document.getElementById('email-html-preview').innerHTML;
+            const blob = new Blob([emailHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const articleId = document.getElementById('article-id').value.trim() || 'article';
+            
+            a.href = url;
+            a.download = `email-${articleId}-${new Date().toISOString().split('T')[0]}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('Email template downloaded!', 'success');
+        }
+
+        // Load subscriber count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof newsletterManager !== 'undefined') {
+                document.getElementById('subscriber-count').textContent = newsletterManager.getSubscriberCount();
+            }
+        });
+
+        // Email sending functions
+        function sendViaDefaultEmail() {
+            if (typeof newsletterManager === 'undefined') {
+                showMessage('Newsletter manager not loaded', 'error');
+                return;
+            }
+
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                showMessage('No subscribers found', 'error');
+                return;
+            }
+
+            const title = document.getElementById('article-title').value.trim();
+            const excerpt = document.getElementById('article-excerpt').value.trim();
+            const articleId = document.getElementById('article-id').value.trim();
+
+            if (!title || !excerpt || !articleId) {
+                showMessage('Please generate an article first', 'error');
+                return;
+            }
+
+            const articleUrl = `https://iristhepianist.github.io/iris-articles/article.html?id=${articleId}`;
+            
+            // Create simple text email body
+            const subject = `New Article: ${title} - lambda`;
+            const body = `Hi there!
+
+We've just published a new article on lambda:
+
+${title}
+
+${excerpt}
+
+Read the full article here: ${articleUrl}
+
+---
+To unsubscribe, visit: https://iristhepianist.github.io/iris-articles/index.html?unsubscribe=YOUR_ID
+
+lambda - youth journalism`;
+
+            // Get all email addresses
+            const emailList = subscribers.map(sub => sub.email).join(',');
+            
+            // Create mailto link
+            const mailtoLink = `mailto:?bcc=${encodeURIComponent(emailList)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            showMessage(`Opening email client with ${subscribers.length} subscribers in BCC...`, 'success');
+        }
+
+        function generateIndividualEmails() {
+            if (typeof newsletterManager === 'undefined') return;
+
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                showMessage('No subscribers found', 'error');
+                return;
+            }
+
+            const title = document.getElementById('article-title').value.trim();
+            const excerpt = document.getElementById('article-excerpt').value.trim();
+            const category = document.getElementById('article-category').value;
+            const date = document.getElementById('article-date').value;
+            const articleId = document.getElementById('article-id').value.trim();
+
+            if (!title || !excerpt || !articleId) {
+                showMessage('Please generate an article first', 'error');
+                return;
+            }
+
+            const articleUrl = `https://iristhepianist.github.io/iris-articles/article.html?id=${articleId}`;
+            
+            let emailsList = `<h4>Individual Emails (${subscribers.length} subscribers)</h4>`;
+            emailsList += `<p style="font-size: 11px; color: #666; margin-bottom: 10px;">Click on any email to open it in your email client:</p>`;
+            
+            subscribers.forEach((sub, index) => {
+                const unsubscribeUrl = `https://iristhepianist.github.io/iris-articles/index.html?unsubscribe=${sub.id}`;
+                const greeting = sub.name ? `Hi ${sub.name}` : 'Hi there';
+                
+                const subject = `New Article: ${title} - lambda`;
+                const body = `${greeting}!
+
+We've just published a new article on lambda:
+
+${title}
+
+${excerpt}
+
+Read the full article here: ${articleUrl}
+
+---
+To unsubscribe, click here: ${unsubscribeUrl}
+
+lambda - youth journalism`;
+
+                const mailtoLink = `mailto:${sub.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                emailsList += `<div style="padding: 8px; border-bottom: 1px solid #EEE; font-size: 11px;">
+                    <strong>${index + 1}.</strong> 
+                    <a href="${mailtoLink}" style="color: #0000FF; text-decoration: underline;">${sub.email}</a>
+                    ${sub.name ? `<span style="color: #666;"> (${sub.name})</span>` : ''}
+                </div>`;
+            });
+
+            const outputDiv = document.getElementById('email-send-output');
+            outputDiv.innerHTML = emailsList;
+            outputDiv.style.display = 'block';
+            
+            showMessage(`Generated ${subscribers.length} individual email links`, 'success');
+        }
+
+        function exportForMailchimp() {
+            if (typeof newsletterManager === 'undefined') return;
+
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                showMessage('No subscribers found', 'error');
+                return;
+            }
+
+            const title = document.getElementById('article-title').value.trim();
+            const articleId = document.getElementById('article-id').value.trim();
+
+            if (!title || !articleId) {
+                showMessage('Please generate an article first', 'error');
+                return;
+            }
+
+            // Get the HTML template
+            const emailHTML = document.getElementById('email-html-preview').innerHTML;
+
+            const instructions = `<h4>Mailchimp Export Instructions</h4>
+<ol style="font-size: 11px; line-height: 1.8;">
+    <li>Download the subscriber list as CSV (use button above)</li>
+    <li>Import CSV to Mailchimp audience</li>
+    <li>Create a new campaign in Mailchimp</li>
+    <li>Choose "Regular Email Campaign"</li>
+    <li>Select your imported audience</li>
+    <li>In the design step, choose "Code your own"</li>
+    <li>Paste the HTML template (already generated above)</li>
+    <li>Replace <code>{{SUBSCRIBER_ID}}</code> with Mailchimp merge tag <code>*|UNIQID|*</code></li>
+    <li>Preview and test</li>
+    <li>Schedule or send!</li>
+</ol>
+<p style="font-size: 11px; color: #666; margin-top: 10px;">
+    <strong>Subscribers:</strong> ${subscribers.length}<br>
+    <strong>Campaign Name:</strong> New Article - ${title}
+</p>`;
+
+            const outputDiv = document.getElementById('email-send-output');
+            outputDiv.innerHTML = instructions;
+            outputDiv.style.display = 'block';
+            
+            showMessage('Mailchimp instructions displayed. Download CSV and copy HTML template above.', 'success');
+        }
+
+        function exportForSendGrid() {
+            if (typeof newsletterManager === 'undefined') return;
+
+            const subscribers = newsletterManager.getSubscribers();
+            if (subscribers.length === 0) {
+                showMessage('No subscribers found', 'error');
+                return;
+            }
+
+            const title = document.getElementById('article-title').value.trim();
+            const excerpt = document.getElementById('article-excerpt').value.trim();
+            const articleId = document.getElementById('article-id').value.trim();
+
+            if (!title || !articleId) {
+                showMessage('Please generate an article first', 'error');
+                return;
+            }
+
+            // Create SendGrid-compatible CSV with custom fields
+            let sendgridCSV = 'email,name,subscriber_id\n';
+            subscribers.forEach(sub => {
+                sendgridCSV += `${sub.email},"${sub.name || ''}",${sub.id}\n`;
+            });
+
+            const instructions = `<div style="background: #E8F4F8; padding: 15px; border-left: 4px solid #FFA500; margin-bottom: 15px;">
+    <strong style="color: #FFA500; font-size: 14px;">🚀 SendGrid Quick Start</strong>
+    <p style="margin: 10px 0 0 0; font-size: 11px;">Follow these steps to send your newsletter:</p>
+</div>
+
+<h4 style="font-size: 13px; margin-bottom: 10px;">Step 1: Download Contacts</h4>
+<button class="btn-primary" onclick="downloadSendGridCSV()" style="margin-bottom: 15px;">
+    📥 Download SendGrid CSV (${subscribers.length} contacts)
+</button>
+
+<h4 style="font-size: 13px; margin-bottom: 10px;">Step 2: Import to SendGrid</h4>
+<ol style="font-size: 11px; line-height: 1.8; margin-bottom: 15px;">
+    <li>Go to <a href="https://mc.sendgrid.com/contacts" target="_blank" style="color: #0000FF;">SendGrid Contacts</a></li>
+    <li>Click <strong>"Add Contacts"</strong> → <strong>"Upload CSV"</strong></li>
+    <li>Upload the CSV you downloaded above</li>
+    <li>Map fields:
+        <ul style="margin: 5px 0;">
+            <li><code>email</code> → <strong>Email</strong></li>
+            <li><code>name</code> → <strong>First Name</strong> (or skip if empty)</li>
+            <li><code>subscriber_id</code> → <strong>Create Custom Field</strong> → name it <code>subscriber_id</code></li>
+        </ul>
+    </li>
+    <li>Click <strong>"Upload"</strong> and wait for completion</li>
+</ol>
+
+<h4 style="font-size: 13px; margin-bottom: 10px;">Step 3: Create Email Campaign</h4>
+<ol style="font-size: 11px; line-height: 1.8; margin-bottom: 15px;">
+    <li>Go to <a href="https://mc.sendgrid.com/single-sends" target="_blank" style="color: #0000FF;">SendGrid Single Sends</a></li>
+    <li>Click <strong>"Create Single Send"</strong></li>
+    <li>Select <strong>"All Contacts"</strong> → <strong>Next</strong></li>
+    <li>Choose your verified sender</li>
+    <li>Subject: <code>New Article: ${title} - lambda</code></li>
+    <li>Preview Text: <code>${excerpt.substring(0, 100)}...</code></li>
+    <li>Click <strong>Next</strong></li>
+</ol>
+
+<h4 style="font-size: 13px; margin-bottom: 10px;">Step 4: Add Email Template</h4>
+<ol style="font-size: 11px; line-height: 1.8; margin-bottom: 15px;">
+    <li>Choose <strong>"Code Editor"</strong></li>
+    <li>Delete default HTML</li>
+    <li><strong>Paste the HTML template</strong> (generated above in "Email Template" section)</li>
+    <li><strong style="color: #CC0000;">Important:</strong> Find <code>{{SUBSCRIBER_ID}}</code> in the template</li>
+    <li><strong style="color: #CC0000;">Replace it with:</strong> <code>{{subscriber_id}}</code> (lowercase)</li>
+    <li>Click <strong>Next</strong></li>
+</ol>
+
+<h4 style="font-size: 13px; margin-bottom: 10px;">Step 5: Send!</h4>
+<ol style="font-size: 11px; line-height: 1.8;">
+    <li>Click <strong>"Send Test"</strong> to email yourself a preview</li>
+    <li>Review the test email in your inbox</li>
+    <li>If everything looks good, return to SendGrid</li>
+    <li>Click <strong>"Schedule"</strong> or <strong>"Send Now"</strong></li>
+    <li>🎉 Done! Check stats in 24 hours at <a href="https://mc.sendgrid.com/stats" target="_blank" style="color: #0000FF;">SendGrid Stats</a></li>
+</ol>
+
+<div style="background: #FFF3CD; border: 1px solid #FFA500; padding: 10px; margin-top: 15px;">
+    <strong style="font-size: 11px;">📖 Need detailed help?</strong><br>
+    <a href="SENDGRID_SETUP.md" target="_blank" style="color: #0000FF; font-size: 11px;">
+        Open Complete SendGrid Setup Guide
+    </a>
+</div>`;
+
+            const outputDiv = document.getElementById('email-send-output');
+            outputDiv.innerHTML = instructions;
+            outputDiv.style.display = 'block';
+            
+            // Store CSV in a global variable for download
+            window.sendgridCSVData = sendgridCSV;
+            
+            showMessage('SendGrid export ready! Download CSV and follow instructions below.', 'success');
+        }
+
+        function downloadSendGridCSV() {
+            if (!window.sendgridCSVData) {
+                showMessage('Generate SendGrid export first', 'error');
+                return;
+            }
+
+            const blob = new Blob([window.sendgridCSVData], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const articleId = document.getElementById('article-id').value.trim() || 'article';
+            
+            a.href = url;
+            a.download = `sendgrid-contacts-${articleId}-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('SendGrid CSV downloaded!', 'success');
+        }
     </script>
+    <script src="newsletter.js"></script>
     <footer>
         <p class="footer-note"><a href="privacy.html">Privacy Policy</a></p>
     </footer>
